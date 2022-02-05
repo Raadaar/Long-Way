@@ -1,4 +1,3 @@
-from __future__ import barry_as_FLUFL
 import sys
 import pygame as pg
 import os
@@ -201,5 +200,5 @@ while True:
         fail.render()
     #win.blit(fail[4], (0, 0))
     pg.display.flip() ##    = pg.display.update()
-    clock.tick(144)
-    #g.time.wait(1)
+    clock.tick(60)
+    #pg.time.wait(1)

@@ -1,4 +1,5 @@
 from script.start_game import win, f1
+from script.items import food, armor, arms, ring, thing
 ibi = ['Голова', 'Туловище', 'Ноги', 'Оружие', 'Щит', 'Кольцо_0', 'Кольцо_1', 'Кольцо_2']
 class inventory_class:
     # Создаёт обект инвенторя, inve это лист, rasmer максимальная длина
@@ -12,19 +13,19 @@ class inventory_class:
         #print(iventar.inv[0])
         sort_spik = []
         if uslow == 0:
-            sor = ['Еда']
+            sor = (food, )
         elif uslow == 1:
-            sor = ['Голова', 'Туловище', 'Ноги', 'Оружие', 'Щит', 'Кольцо_0', 'Кольцо_1', 'Кольцо_2']
+            sor = (arms, armor, ring)
         else:
-            sor = ['Еда', 'Голова', 'Туловище', 'Ноги', 'Оружие', 'Щит', 'Кольцо_0', 'Кольцо_1', 'Кольцо_2']
+            sor = (thing, )
         if uslow > 9:
             if uslow > 14:
                 sor = ['Кольцо_0', 'Кольцо_1', 'Кольцо_2']
             else:
                 sor = ibi[uslow % 10]
-        for i in self.inventory:
-            if i[0][1] in sor:
-                sort_spik.append(i)
+        for it in self.inventory:
+            if isinstance(it[0], sor):
+                sort_spik.append(it)
         return sort_spik
     # Добовляет предмет в инвентарь, если такой уже есть, добовляет к количеству существующего
     def dopov(self, pr):
@@ -33,6 +34,7 @@ class inventory_class:
             if self.inventory[i][0] == pr[0]:
                 prov = True       
                 self.inventory[i][1] += pr[1]
+                break
         if prov == False:
             self.inventory.append(pr)
     # Отрисовывает название вещей в инвенторе
@@ -44,7 +46,7 @@ class inventory_class:
             perexod += 1
             if perexod == 3:
                 dlina -= 10
-            win.blit(f1.render(str(i[0][0]), True, (180, 0, 0)), (dlina, visata)) 
+            win.blit(f1.render(str(i[0].title), True, (180, 0, 0)), (dlina, visata)) 
             dlina += 300
             if perexod == 1:
                 dlina += 15
@@ -76,21 +78,3 @@ predmeti = (('Яблоко', 'Еда', 3), ('Хлеб', 'Еда', 4),
             ('Маг, к, а', 'Кольцо_2', [(('Атака', 3), ('', '')), (('', ''), ('', '')), (('', ''), ('', ''))]),
             )
 iventar = inventory_class([], 33)
-iventar.dopov([predmeti[1], 3])
-iventar.dopov([predmeti[2], 1])
-iventar.dopov([predmeti[3], 1])
-iventar.dopov([predmeti[4], 1])
-iventar.dopov([predmeti[5], 1])
-iventar.dopov([predmeti[6], 1])
-iventar.dopov([predmeti[7], 1])
-iventar.dopov([predmeti[8], 1])
-iventar.dopov([predmeti[9], 1])
-iventar.dopov([predmeti[10], 1])
-iventar.dopov([predmeti[11], 1])
-iventar.dopov([predmeti[12], 1])
-iventar.dopov([predmeti[13], 1])
-iventar.dopov([predmeti[12], 1])
-iventar.dopov([predmeti[13], 1])
-iventar.dopov([predmeti[14], 1])
-iventar.dopov([predmeti[15], 1])
-iventar.dopov([predmeti[16], 1])

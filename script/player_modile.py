@@ -1,4 +1,4 @@
-from script.inven import iventar, f1
+#from script.inven import iventar, f1
 class Pleeer:
     def __init__(self, name, maxhp, maxmp, msp,
         ataka, pro, mag, wil, agil, dext,
@@ -59,38 +59,11 @@ class Pleeer:
         self.equipment = {'Голова': '',
                         'Туловище': '',
                         'Ноги': '',
-                        'Оружие': '',
-                        'Щит': '',
+                        'Оружие_0': '',
+                        'Оружие_1': '',
                         'Кольцо_0': '',
                         'Кольцо_1': '', 
                         'Кольцо_2': ''}
-    # Функция надевание и снимание вещей
-    def don(self, inven, don):
-        # Удаляет старые характиристики
-        for i in self.items[inven[0][1]][2][0]:
-            if i[0] in [i for i in self.specifications.keys()]:
-                self.specifications[i[0]] -= i[1]
-        for i in self.items[inven[0][1]][2][1]:
-            if i[0] in [i for i in self.chances.keys()]:
-                self.chances[i[0]] -= i[1]        
-        for i in self.items[inven[0][1]][2][2]:
-            if i[0] in [i for i in self.resistance.keys()]:
-                self.resistance[i[0]] -= i[1]
-        # добовляет новые
-        for i in inven[0][2][0]:
-            if i[0] in [i for i in self.specifications.keys()]:
-                self.specifications[i[0]] += i[1]
-        for i in inven[0][2][1]:
-            if i[0] in [i for i in self.chances.keys()]:
-                self.chances[i[0]] += i[1]        
-        for i in inven[0][2][2]:
-            if i[0] in [i for i in self.resistance.keys()]:
-                self.resistance[i[0]] += i[1]
-        # Если предмета у игрока не было
-        if self.items[inven[0][1]][0] != '':
-            iventar.dopov([self.items[inven[0][1]], 1])
-        del iventar.inventory[iventar.inventory.index(inven)]
-        self.items[inven[0][1]] = inven[0]
     def state_step(self):
         for creature in self.condition:
             creature.duration -= 1

@@ -1,4 +1,3 @@
-from re import T
 from script.start_game import win, pg, sys, randint, f1
 # Название игры
 pg.display.set_caption('Long Way')
@@ -33,8 +32,11 @@ list_spells = (('Магический удар', 2, 10, ('Воздушный'), 
 list_adility = (('Удар с ноги', 1, 6, ('Пронзающий'), False),
                  ('Круговой удар', 2, 9, ('Дробящий'), True))
 # inventory_class
+from script.items import *
 from script.inven import *
 from script.player_modile import *
+for i in thing.list_of_items.values():
+    iventar.dopov((i, 1))
 #
 def attack(attacking, attacked):
     if randint(0, attacking.chances["Попадание"]) > attacked.chances['Уворот']:
