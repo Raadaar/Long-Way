@@ -25,7 +25,7 @@ class interface:
         y = self.dimensions[1]
         for i in spi:
             for d in self.ind:
-                win.blit(f1.render(str(i[d[0]]), True, (180, 100, 0)), (x + d[1], y + d[2]))
+                win.blit(f1.render(str(i[0].title), True, (180, 100, 0)), (x + d[1], y + d[2]))
             x += self.bias[0]
             if x == self.dimensions[2]:
                 if y == self.dimensions[3]:
@@ -38,6 +38,17 @@ class interface:
         pass
 obw_od = interface(men_sn_ok[0], (0, 0), (50, 80, 50, 480), (0, 50), (0, 2, 2))
 dressed_item_specifications = interface(men_sn_ok[2], (0, 0), (465, 130, 765, 280), (150, 25), (0, 2, 2), (1, 130, 2))
-dressed_item_chances = interface(men_sn_ok[2], (0, 0), (765, 130, 765, 280), (150, 25), (0, 2, 2), (1, 130, 2), s=False)
-dressed_item_resistance = interface(men_sn_ok[2], (0, 0), (1065, 130, 765, 280), (150, 25), (0, 2, 2), (1, 130, 2), s=False)
+dressed_item_chances = interface('', (0, 0), (765, 130, 765, 280), (150, 25), (0, 2, 2), (1, 130, 2), s=False)
+dressed_item_resistance = interface('', (0, 0), (1065, 130, 765, 280), (150, 25), (0, 2, 2), (1, 130, 2), s=False)
 gr = interface(men_sn_ok[1], (0, 0), (0, 484, 1360, 764), (136, 28), (0, 2, 2), (1, 126, 2))
+def showing_properties(outfit):
+    if outfit != '':
+        dressed_item_specifications(outfit.specifications.values)
+        dressed_item_chances(outfit.chances.values)
+        dressed_item_resistance(outfit.resistance.values)
+    nam = tuple(outfit.equipment.keys)
+    for i in range(len(nam)):
+        win.blit(f1.render(str(nam[i][:nam[i].rfind('_')]), True, (0, 255, 127)), (50, 80 + 50 * i))
+        
+
+

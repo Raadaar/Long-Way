@@ -3,8 +3,11 @@ import pygame as pg
 import os
 from datetime import datetime
 
+
+
 cr_data = datetime.now().second
 fps = 0
+fps_pro = 0
 
 pg.font.init()
 pg.init()
@@ -12,8 +15,8 @@ pg.init()
 
 win = pg.display.set_mode((1360, 768))
 pg.display.set_caption("Map editor 'Long Way'")
+f0 = pg.font.Font(sys.path[0] + "\\Fonts\\Gabriola One.ttf", 28)
 
-pg.GL_ACCELERATED_VISUAL = 1
 class cam:
     def __init__(self, x, y):
         self.rect = pg.Rect(x, y, 1360, 768)
@@ -50,7 +53,7 @@ class object:
             pg.draw.rect(win, self.RGP, (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], self.rect[2], self.rect[3]), 2)
         else:
             for i in self.sprait:
-                win.blit(i, (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1]))
+                win.blit(i, (self.rect[0], self.rect[1]))
     def vns(self):
         objects.append(sam_object(self.rect[0], self.rect[1], self.rect[2], self.rect[3]))
     def dop(self, v):
@@ -66,7 +69,8 @@ class sam_object:
     def vns(self):
         print('f')
 #objects = [object(250, 250, 30, 30)]
-fail = [[pg.image.load(sys.path[0] + f"\\aset\\{i}"), f"\\aset\\{i}"] for i in os.listdir('\prog\Long Way\\aset') if '.png' in i]
+fail = [[pg.image.load(sys.path[0] + f"\\aset\\{i}").convert(), f"\\aset\\{i}"] for i in os.listdir('\prog\Long Way\\aset') if '.png' in i]
+tra = pg.image.load(sys.path[0] + f"\\aset\\tra.png").convert()
 class archive_image:
     def __init__(self, image_arh):
         self.image_arh = image_arh
@@ -95,31 +99,77 @@ class archive_image:
         for i in self.image_arh_obj:
             for d in i.sprait:
                 win.blit(pg.transform.scale(d, (i.rect[2], i.rect[3])), (i.rect[0], i.rect[1]))
+
+#from script.multip import division_of_work
 fail = archive_image(fail)
 player = Player(0, 0)
 camera = cam(0, 0)
 clock = pg.time.Clock()
 objects = []
-x_ = 350 #int(input('Ширина карты '))
-y_ = 350 #int(input('Высота карты '))
+x_ = 1000 #int(input('Ширина карты '))
+y_ = 1000 #int(input('Высота карты '))
 tra = pg.image.load(sys.path[0] + "\\aset\\tra.png").convert()
 l = pg.image.load(sys.path[0] + "\\aset\\icon.png").convert()
-for x in range(x_):
-    for y in range(y_):
-        objects.append(object(x * 50, y * 50, 50, 50))
-        #objects.append(object(x * -50, y * -50, 50, 50))
+class big_chunk:
+    def __init__(self, x, y, width=5000, height=5000) -> None:
+        self.rect = pg.Rect(x, y, width, height)
+        self.compound = (middle_chunk(x, y), middle_chunk(x + 2500, y), middle_chunk(x, y + 2500), middle_chunk(x + 2500, y + 2500))
+class middle_chunk:
+    def __init__(self, x, y, width=2500, height=2500) -> None:
+        self.rect = pg.Rect(x, y, width, height)
+        self.compound = (small_chunk(x, y), small_chunk(x + 1250, y), small_chunk(x, y + 1250), small_chunk(x + 1250, y + 1250))
+class small_chunk:
+    def __init__(self, x, y, width=1250, height=1250) -> None:
+        self.rect = pg.Rect(x, y, width, height)
+        self.compound = []
+        for x_para in range(25):
+            for y_para in range(25):
+                self.compound.append(object(x + x_para * 50, y + y_para * 50, 50, 50)) #, spr=(tra, )
+        self.compound = tuple(self.compound)   
+prop_objects = []
+for x in range(x_ // 100):
+    for y in range(y_ // 100):
+        prop_objects.append(big_chunk(x * 5000, y * 5000))
+def otr():
+    x = []
+    for i in prop_objects:
+        if i.rect.colliderect(camera.rect):
+            pg.draw.rect(win, (0, 0, 255), (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1], i.rect[2], i.rect[3]), 10)
+            for d in i.compound:
+                if d.rect.colliderect(camera.rect):
+                    pg.draw.rect(win, (255, 0, 255), (d.rect[0] - camera.rect[0], d.rect[1] - camera.rect[1], d.rect[2], d.rect[3]), 7)
+                    for v in d.compound:
+                        if v.rect.colliderect(camera.rect):
+                            pg.draw.rect(win, (0, 255, 0), (v.rect[0] - camera.rect[0], v.rect[1] - camera.rect[1], v.rect[2], v.rect[3]), 5)
+                            [obj.draw() for obj in v.compound if obj.rect.colliderect(camera.rect)]
+                            if False:
+                                for ob in v.compound:
+                                    x.append(ob)
+                                    ob.draw()
+    return x
+#[ob.draw() for ob in [v for v in [d for d in [i for i in prop_objects if i.rect.colliderect(camera.rect)][0].compound if d.rect.colliderect(camera.rect)][0].compound if v.rect.colliderect(camera.rect)] if ob.rect.colliderect(camera.rect)]
+if False:
+    for x in range(x_):
+        for y in range(y_):
+            objects.append(object(x * 50, y * 50, 50, 50))
+            #objects.append(object(x * -50, y * -50, 50, 50))
 vs_pr = [tra, "\\aset\\tra.png"]
+vaj = []
 pok = False
 speed = 5
+faj = ()
 mouse_cursor = ((win.get_width() - l.get_width())/2, (win.get_height() - l.get_height())/2)
+min_max = [300, 0]
 while True:
     for event in pg.event.get():
         if event.type == pg.QUIT:
+            print(f'Минамальный фпс - {min_max[0]}')
+            print(f'Максимальный фпс - {min_max[1]}')
             pg.quit()
             sys.exit()
         if event.type==pg.KEYDOWN:
             if event.key == pg.K_z:
-                print(camera.rect[0], camera.rect[1])
+                print(f"{camera.rect[0]}, {camera.rect[1]}, мышки: {x}, {y}")
             if event.key == pg.K_ESCAPE:
                 if pok == True:
                     pok = False
@@ -148,9 +198,11 @@ while True:
             x -= l.get_width()/2
             y -= l.get_height()/2
             if pok == False:
-                for obj in objects:
+                print(len(faj))
+                for obj in faj:
                     if isinstance(obj, object):
-                        if obj.rect.colliderect(pg.Rect((x + 25) + camera.rect[0], (y + 25) + camera.rect[1], 1, 1)):
+                        if obj.rect.colliderect(pg.Rect(x + 25, y + 25, 1, 1)):
+                        #if obj.rect.colliderect(pg.Rect((x + 25) + camera.rect[0], (y + 25) + camera.rect[1], 1, 1)):
                             if event.button == 1:
                                 if vs_pr not in obj.sprait:
                                     obj.dop(vs_pr)
@@ -185,20 +237,29 @@ while True:
         for obj in objects:
             if obj.rect.colliderect(camera.rect):
                 obj.draw()
-    [obj.draw() for obj in objects if obj.rect.colliderect(camera.rect)]
+    faj = otr()
+    #[obj.draw() for obj in objects if obj.rect.colliderect(camera.rect)]
     #map(.draw, filter(lambda obj: obj.rect.colliderect(camera.rect), objects))
     player.draw()
     fps += 1
-    if fps == 144:
-        fps = 143
-    if cr_data != datetime.now().second:
-        cr_data = datetime.now().second
-        print(fps)
+    if fps == 300:
+        fps = 299
+    win.blit(f0.render(str(fps_pro), True, (23, 128, 109)), (0, 0))
+    nis = datetime.now().second
+    if cr_data != nis:
+        cr_data = nis
+        fps_pro = fps
+        if fps_pro < min_max[0]:
+            min_max[0] = fps_pro
+        elif fps_pro > min_max[1]:
+            min_max[1] = fps_pro
         fps = 0
     #win.blit(pg.transform.scale(fail[2], (50, 50)), (500, 500))
+    pg.draw.rect(win, (0, 0, 0), (x + 25 - player.rect[0] + camera.rect[0], y + 25 + player.rect[1] - camera.rect[1], 5, 5), 5)
     if pok == True:
         fail.render()
     #win.blit(fail[4], (0, 0))
+    #pg.display.update()
     pg.display.flip() ##    = pg.display.update()
-    clock.tick(60)
-    #pg.time.wait(1)
+    clock.tick(300)
+    pg.time.wait(1)

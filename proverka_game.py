@@ -220,16 +220,20 @@ while  1:
     #win.blit(pla, (vector[0], 512 - vector[1]))
     #win.blit(text1, (50, 600))
     for i in men_list:
+        ost_pyt = i.spis
+        for d in i.pyt:
+            ost_pyt = ost_pyt[d]
         if i.aktv == True:
             men_ive_gl = True 
-            ost_pyt = i.spis
-            for d in i.pyt:
-                ost_pyt = ost_pyt[d]
+
             win.blit(ost_pyt[i.ataw][0].sprait, (0, 0))
             if ost_pyt[i.ataw][0].ak != None:
                 ost_pyt[i.ataw][0].prin_tab(ost_pyt[i.ataw][0].tab)
             if ost_pyt[i.ataw][0].ak == True:
                 ost_pyt[i.ataw][0].draw()
+        elif ost_pyt[i.ataw][0].inactive_display != '':
+            ost_pyt[i.ataw][0].inactive_display[0](ost_pyt[i.ataw][0].inactive_display[1])
+
     # проверка, ативированно ли меню снарежения
     if men_sn[0] == True:
         obw_od.rendering_interface(pleeer.items.values())

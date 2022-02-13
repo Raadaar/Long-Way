@@ -1,9 +1,11 @@
 from script.start_game import win, pg
 import sys
 from script.inven import *
+from script.player_modile import pleeer
+from script.modile_interface import showing_properties, gr
 ramka_inventar = pg.image.load(sys.path[0] + "\\aset\\men\\ramka_inven.png").convert_alpha()
 class spreadsheet:
-    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='') -> None:
+    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='') -> None:
         self.sprait = s # Спрайт
         self.sprait_ram = s_r # Спрайт рамки
         self.start_coordinates = n_r # Начальные координаты рамки
@@ -14,6 +16,7 @@ class spreadsheet:
         self.tab = tab # Таблица с которой надо работать
         self.prin_tab = prin_tab # Принцип отрисовки таблицы
         self.ak = False # Активность таблицы
+        self.inactive_display = ''
         if s_r == '':
             self.ak = None
     
@@ -31,6 +34,8 @@ class spreadsheet:
         if self.p + slow[kyda] > 0:
             self.p += slow[kyda]
         print(self.p)
+men_os = pg.image.load(sys.path[0] + "\\aset\\men\\oc_okn.png").convert_alpha()
+ram_cn = pg.image.load(sys.path[0] + "\\aset\\men\\ram_cn.png").convert_alpha()
 x = (
     (('Низ', 'Верх'), 7),
     (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Back.png").convert_alpha()), ),
@@ -40,7 +45,9 @@ x = (
         (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=iventar.sorti(1), prin_tab=iventar.otrisovka ), ), 
         (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=iventar.sorti(2), prin_tab=iventar.otrisovka ), ), )),
     (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Quests.png").convert_alpha()), ),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Equipment.png").convert_alpha()), ),
+    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Equipment.png").convert_alpha()), (
+        (('Низ', 'Верх'), 8),
+        (spreadsheet(s=men_os, s_r=ram_cn, n_r=(484, 0), p_r=(136, 28), g_r=(1360, 768), tab=iventar.sorti(pleeer.equipment['Голова']), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, pleeer.equipment['Голова'])), ), )),
     (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Saving.png").convert_alpha()), ),
     (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Loading.png").convert_alpha()), ),
     (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Exit.png").convert_alpha()), )
