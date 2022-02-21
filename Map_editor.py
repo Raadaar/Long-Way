@@ -261,5 +261,5 @@ while True:
     #win.blit(fail[4], (0, 0))
     #pg.display.update()
     pg.display.flip() ##    = pg.display.update()
-    clock.tick(300)
+    clock.tick(200)
     pg.time.wait(1)

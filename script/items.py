@@ -148,7 +148,7 @@ def converting_things_from_text_format_to_game_class(ite):
             if sel[0] in index_dictionary:
                 item_class_dictionary[index_dictionary.index(sel[0])] = int(sel[1])
             else:
-                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в придете {ite[0]}')
+                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в предмете {ite[0]}')
         potion(title=ite[0], ataka=item_class_dictionary[0], pro=item_class_dictionary[1], mag=item_class_dictionary[2], wil=item_class_dictionary[3], agil=item_class_dictionary[4], dext=item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22], mp=item_class_dictionary[23], hp=item_class_dictionary[24], duration=item_class_dictionary[25])
     elif 'Оружие' in ite[1]:
         for i in range(2, len(ite)):
@@ -156,7 +156,7 @@ def converting_things_from_text_format_to_game_class(ite):
             if sel[0] in index_dictionary:
                 item_class_dictionary[index_dictionary.index(sel[0])] = int(sel[1])
             else:
-                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в придете {ite[0]}')
+                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в предмете {ite[0]}')
         arms(kind=ite[1].split('/')[1],title=ite[0], ataka=item_class_dictionary[0], pro=item_class_dictionary[1], mag=item_class_dictionary[2], wil=item_class_dictionary[3], agil=item_class_dictionary[4], dext=item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22])
     elif 'Броня' in ite[1]:
         li = ['Максимальное количество здоровья', 'Максимальное количество магии']
@@ -167,7 +167,7 @@ def converting_things_from_text_format_to_game_class(ite):
             if sel[0] in index_dictionary:
                 item_class_dictionary[index_dictionary.index(sel[0])] = int(sel[1])
             else:
-                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в придете {ite[0]}')
+                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в предмете {ite[0]}')
         armor(kind=ite[1].split('/')[1],title=ite[0], ataka=item_class_dictionary[0], pro=item_class_dictionary[1], mag=item_class_dictionary[2], wil=item_class_dictionary[3], agil=item_class_dictionary[4], dext=item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22], maxmp=item_class_dictionary[23], maxhp=item_class_dictionary[24]) 
     elif ite[1] == 'Еда':  
         li = ['Maна', 'Здоровье']
@@ -178,7 +178,7 @@ def converting_things_from_text_format_to_game_class(ite):
             if sel[0] in index_dictionary:
                 item_class_dictionary[index_dictionary.index(sel[0])] = int(sel[1])
             else:
-                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в придете {ite[0]}')
+                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в предмете {ite[0]}')
         food(title=ite[0], mp=item_class_dictionary[0], hp=item_class_dictionary[1])
     elif ite[1] == 'Кольцо':  
         li = ['Максимальное количество здоровья', 'Максимальное количество магии']
@@ -189,7 +189,7 @@ def converting_things_from_text_format_to_game_class(ite):
             if sel[0] in index_dictionary:
                 item_class_dictionary[index_dictionary.index(sel[0])] = int(sel[1])
             else:
-                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в придете {ite[0]}')
+                print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в предмете {ite[0]}')
         ring(kind=ite[1], title=ite[0], ataka=item_class_dictionary[0], pro=item_class_dictionary[1], mag=item_class_dictionary[2], wil=item_class_dictionary[3], agil=item_class_dictionary[4], dext=item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22], maxmp=item_class_dictionary[23], maxhp=item_class_dictionary[24]) 
 with open('items.txt', 'r', encoding='utf-8') as file:
     for line in file:

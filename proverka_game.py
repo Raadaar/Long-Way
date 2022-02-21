@@ -1,4 +1,5 @@
 from script.start_game import win, pg, sys, randint, f1
+import script.guide
 # Название игры
 pg.display.set_caption('Long Way')
 from script.base_classes import player, object, camera
@@ -7,23 +8,23 @@ from script.base_classes import player, object, camera
 #camera = cam(0, 0)
 # "D:/prog/game/aset/derevo.png"
 with open(r'D:\\prog\\f.txt', 'r', encoding='utf-8') as file:
-    objects = [object(int(i[1][0]), int(i[1][1]), int(i[1][2]), int(i[1][3]), spr=[pg.image.load(sys.path[0] + i[0][0]).convert_alpha(), ]) for i in (list(map(lambda x: [i.split('_') for i in x.split()], list(map(str.strip, file.readlines())))))]
+    objects = [object(int(i[1][0]), int(i[1][1]), int(i[1][2]), int(i[1][3]), spr=[pg.image.load(script.guide.path + i[0][0]).convert_alpha(), ]) for i in (list(map(lambda x: [i.split('_') for i in x.split()], list(map(str.strip, file.readlines())))))]
 # Загрузка спрайтов
-men_iven =  [pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_items.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_important.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\men_ive.png").convert_alpha()]
-ramka = pg.image.load(sys.path[0] + "\\aset\\men\\ramka.png").convert_alpha()
+men_iven =  [pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive.png").convert_alpha()]
+ramka = pg.image.load(script.guide.path + "\\aset\\men\\ramka.png").convert_alpha()
 
-pleer = pg.image.load(sys.path[0] + "\\aset\\pleer.png").convert_alpha()
-battle_sprait_men = [pg.image.load(sys.path[0] + "\\aset\\men\\oc_m_b.png").convert_alpha()]
-battle_sprait = [pg.image.load(sys.path[0] + "\\aset\\men\\sac_b_les.png").convert_alpha()]
-battle_sprait_vragi = [pg.image.load(sys.path[0] + "\\aset\\men\\vrag.png").convert_alpha()] 
-battle_ramka_g = [pg.image.load(sys.path[0] + "\\aset\\men\\ramka_g_m_b.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\ramka_p_sc.png").convert_alpha()]
-vi = pg.image.load(sys.path[0] + "\\aset\\men\\vi.png").convert_alpha()
-men_sn_ok = [pg.image.load(sys.path[0] + "\\aset\\men\\oc_okn.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\dop_okn.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\dop_okn_n.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\dop_okn_v.png").convert_alpha()]
-ramk = pg.image.load(sys.path[0] + "\\aset\\men\\ramka_e.png").convert_alpha()
-ramk_ = pg.image.load(sys.path[0] + "\\aset\\men\\ramka_m.png").convert_alpha()
-f0 = pg.font.Font(sys.path[0] + "\\Fonts\\HATTEN.ttf", 20)
+pleer = pg.image.load(script.guide.path + "\\aset\\pleer.png").convert_alpha()
+battle_sprait_men = [pg.image.load(script.guide.path + "\\aset\\men\\oc_m_b.png").convert_alpha()]
+battle_sprait = [pg.image.load(script.guide.path + "\\aset\\men\\sac_b_les.png").convert_alpha()]
+battle_sprait_vragi = [pg.image.load(script.guide.path + "\\aset\\men\\vrag.png").convert_alpha()] 
+battle_ramka_g = [pg.image.load(script.guide.path + "\\aset\\men\\ramka_g_m_b.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\ramka_p_sc.png").convert_alpha()]
+vi = pg.image.load(script.guide.path + "\\aset\\men\\vi.png").convert_alpha()
+men_sn_ok = [pg.image.load(script.guide.path + "\\aset\\men\\oc_okn.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn_n.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn_v.png").convert_alpha()]
+ramk = pg.image.load(script.guide.path + "\\aset\\men\\ramka_e.png").convert_alpha()
+ramk_ = pg.image.load(script.guide.path + "\\aset\\men\\ramka_m.png").convert_alpha()
+f0 = pg.font.Font(script.guide.path + "\\Fonts\\HATTEN.ttf", 20)
 text1 = f1.render('Игра ещё не готова, что ты тут делаешь?', True, (0, 180, 0))
-animation_set = [pg.image.load(sys.path[0] + f"\\aset\\GuttyKreumNatureTilesvol1_v2\\AnimationFrames\\Bush/bush32x32transparentanimated{i}.png").convert_alpha() for i in range(1, 14)]
+animation_set = [pg.image.load(script.guide.path + f"\\aset\\GuttyKreumNatureTilesvol1_v2\\AnimationFrames\\Bush/bush32x32transparentanimated{i}.png").convert_alpha() for i in range(1, 14)]
 from script.modile_interface import *
 # Название, трата по мане, урон, тип, масовое или нет заклинание
 list_spells = (('Магический удар', 2, 10, ('Воздушный'), False),
@@ -36,7 +37,7 @@ from script.items import *
 from script.inven import *
 from script.player_modile import *
 for i in thing.list_of_items.values():
-    iventar.dopov((i, 1))
+    iventar.dopov([i, 1])
 #
 def attack(attacking, attacked):
     if randint(0, attacking.chances["Попадание"]) > attacked.chances['Уворот']:
@@ -228,7 +229,7 @@ while  1:
 
             win.blit(ost_pyt[i.ataw][0].sprait, (0, 0))
             if ost_pyt[i.ataw][0].ak != None:
-                ost_pyt[i.ataw][0].prin_tab(ost_pyt[i.ataw][0].tab)
+                ost_pyt[i.ataw][0].prin_tab(ost_pyt[i.ataw][0].table_list)
             if ost_pyt[i.ataw][0].ak == True:
                 ost_pyt[i.ataw][0].draw()
         elif ost_pyt[i.ataw][0].inactive_display != '':

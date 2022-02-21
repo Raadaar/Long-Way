@@ -1,7 +1,7 @@
-from script.start_game import win, pg, sys
-
-f1 = pg.font.Font(sys.path[0] + "\\Fonts\\Gabriola One.ttf", 26)
-men_sn_ok = [pg.image.load(sys.path[0] + "\\aset\\men\\oc_okn.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\dop_okn.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\dop_okn_n.png").convert_alpha(), pg.image.load(sys.path[0] + "\\aset\\men\\dop_okn_v.png").convert_alpha()]
+from script.start_game import win, pg
+import script.guide
+f1 = pg.font.Font(script.guide.path + "\\Fonts\\Gabriola One.ttf", 26)
+men_sn_ok = [pg.image.load(script.guide.path + "\\aset\\men\\oc_okn.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn_n.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn_v.png").convert_alpha()]
 #
 class interface:
     # Данный класс нужен для отображение 

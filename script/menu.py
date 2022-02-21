@@ -1,9 +1,10 @@
 from script.start_game import win, pg
-import sys
+import script.guide
+# script.guide.path
 from script.inven import *
 from script.player_modile import pleeer
 from script.modile_interface import showing_properties, gr
-ramka_inventar = pg.image.load(sys.path[0] + "\\aset\\men\\ramka_inven.png").convert_alpha()
+ramka_inventar = pg.image.load(script.guide.path + "\\aset\\men\\ramka_inven.png").convert_alpha()
 class spreadsheet:
     def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='') -> None:
         self.sprait = s # Спрайт
@@ -13,12 +14,22 @@ class spreadsheet:
         self.p = 1 # Выбор предмета в списке + передвежение рамки
         self.p1 = g_r # Границы передвежения рамки
         self.p2 = '' # Границф
-        self.tab = tab # Таблица с которой надо работать
+        self.list_getting_table = tab # Таблица с которой надо работать ((преобразующие функии/словари), начальный аргумент)
         self.prin_tab = prin_tab # Принцип отрисовки таблицы
         self.ak = False # Активность таблицы
         self.inactive_display = ''
         if s_r == '':
             self.ak = None
+    @property
+    def table_list(self): # Нужно для состовления нужного списка для таблицы
+        x = self.list_getting_table[0]
+        b = self.list_getting_table[1]
+        for i in x:
+            if isinstance(i, dict):
+                b = i[b]
+            else:
+                b = i(b)
+        return b
     
     def draw(self):
         if self.ak == True:
@@ -34,27 +45,28 @@ class spreadsheet:
         if self.p + slow[kyda] > 0:
             self.p += slow[kyda]
         print(self.p)
-men_os = pg.image.load(sys.path[0] + "\\aset\\men\\oc_okn.png").convert_alpha()
-ram_cn = pg.image.load(sys.path[0] + "\\aset\\men\\ram_cn.png").convert_alpha()
+men_os = pg.image.load(script.guide.path + "\\aset\\men\\oc_okn.png").convert_alpha()
+ram_cn = pg.image.load(script.guide.path + "\\aset\\men\\ram_cn.png").convert_alpha()
 x = (
     (('Низ', 'Верх'), 7),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Back.png").convert_alpha()), ),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Items.png").convert_alpha()), (
+    (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Back.png").convert_alpha()), ),
+    (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Items.png").convert_alpha()), (
+        # (s(), ),
         (('Право', 'Лево'), 3),
-        (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_items.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=iventar.sorti(0), prin_tab=iventar.otrisovka ), ),
-        (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=iventar.sorti(1), prin_tab=iventar.otrisovka ), ), 
-        (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=iventar.sorti(2), prin_tab=iventar.otrisovka ), ), )),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Quests.png").convert_alpha()), ),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Equipment.png").convert_alpha()), (
+        (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 0), prin_tab=iventar.otrisovka), ), 
+        (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 1), prin_tab=iventar.otrisovka), ),  
+        (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 2), prin_tab=iventar.otrisovka), ))),
+    (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Quests.png").convert_alpha()), ),
+    (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Equipment.png").convert_alpha()), (
         (('Низ', 'Верх'), 8),
         (spreadsheet(s=men_os, s_r=ram_cn, n_r=(484, 0), p_r=(136, 28), g_r=(1360, 768), tab=iventar.sorti(pleeer.equipment['Голова']), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, pleeer.equipment['Голова'])), ), )),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Saving.png").convert_alpha()), ),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Loading.png").convert_alpha()), ),
-    (spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Exit.png").convert_alpha()), )
+    (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Saving.png").convert_alpha()), ),
+    (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Loading.png").convert_alpha()), ),
+    (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Exit.png").convert_alpha()), )
 )
 
-men_ = spreadsheet(s=pg.image.load(sys.path[0] + "\\aset\\men\\Back.png").convert_alpha(),
-                s_r=pg.image.load(sys.path[0] + "\\aset\\men\\ramka.png").convert_alpha(),
+men_ = spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Back.png").convert_alpha(),
+                s_r=pg.image.load(script.guide.path + "\\aset\\men\\ramka.png").convert_alpha(),
                 n_r=(400, 400), p_r=(10, 10), g_r=(800, 800))
 akt_fn = None
 class meni:
@@ -111,7 +123,13 @@ class meni:
             self.pyt.append(1)
             self.ataw = 1
         elif ost_pyt[self.ataw][0].ak == True and len(ost_pyt[self.ataw]) == 1:
-            print('Пусто!')
+            if ost_pyt[self.ataw][0].p - 1 <= len(ost_pyt[self.ataw][0].table_list):
+                choice_number = [i for i in range(len(iventar.inventory)) if iventar.inventory[i][0] == ost_pyt[self.ataw][0].table_list[ost_pyt[self.ataw][0].p - 1][0]][0]
+                iventar.inventory[choice_number][1] = iventar.inventory[choice_number][1] - 1
+                iventar.inventory[choice_number][0].using(pleeer)
+                if iventar.inventory[choice_number][1] == 0:
+                    del iventar.inventory[choice_number]
+            print(f'Пусто! {[f"{i[0].title}/{i[1]}" for i in iventar.inventory]}')
         else:
             ost_pyt[self.ataw][0].ak = True
 inven = meni(x)

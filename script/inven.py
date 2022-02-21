@@ -20,6 +20,8 @@ class inventory_class:
             sor = (thing, )
         if isinstance(uslow, equipment):
             sort_spik = [d for d in [i for i in self.inventory if isinstance(i[0], equipment)] if d[0].kind == uslow.kind or isinstance(d[0], arms) and isinstance(d[0], uslow)] # В первом кругу проверяется является ли предмет снарежением, во втором является ли вид снарежение одинаковым, если это не оружие
+        elif uslow == '':
+            return sort_spik
         else:
             for it in self.inventory:
                 if isinstance(it[0], sor):
