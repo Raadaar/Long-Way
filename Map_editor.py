@@ -1,3 +1,4 @@
+import re
 import sys
 import pygame as pg
 import os
@@ -134,19 +135,26 @@ def otr():
     x = []
     for i in prop_objects:
         if i.rect.colliderect(camera.rect):
-            pg.draw.rect(win, (0, 0, 255), (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1], i.rect[2], i.rect[3]), 10)
             for d in i.compound:
                 if d.rect.colliderect(camera.rect):
-                    pg.draw.rect(win, (255, 0, 255), (d.rect[0] - camera.rect[0], d.rect[1] - camera.rect[1], d.rect[2], d.rect[3]), 7)
                     for v in d.compound:
                         if v.rect.colliderect(camera.rect):
-                            pg.draw.rect(win, (0, 255, 0), (v.rect[0] - camera.rect[0], v.rect[1] - camera.rect[1], v.rect[2], v.rect[3]), 5)
-                            [obj.draw() for obj in v.compound if obj.rect.colliderect(camera.rect)]
+                            [(obj.draw(), faj.append(obj)) for obj in v.compound if obj.rect.colliderect(camera.rect)]
                             if False:
                                 for ob in v.compound:
                                     x.append(ob)
                                     ob.draw()
     return x
+def recursion_otr(spis, ind):
+    if isinstance(spis[0], object):
+        [(obj.draw(), faj.append(obj)) for obj in spis if obj.rect.colliderect(camera.rect)]
+        return
+    elif spis[ind].rect.colliderect(camera.rect):
+        recursion_otr(spis[ind].compound, 0)
+    ind += 1
+    if ind == len(spis):
+        return
+    return recursion_otr(spis, ind)
 #[ob.draw() for ob in [v for v in [d for d in [i for i in prop_objects if i.rect.colliderect(camera.rect)][0].compound if d.rect.colliderect(camera.rect)][0].compound if v.rect.colliderect(camera.rect)] if ob.rect.colliderect(camera.rect)]
 if False:
     for x in range(x_):
@@ -157,7 +165,7 @@ vs_pr = [tra, "\\aset\\tra.png"]
 vaj = []
 pok = False
 speed = 5
-faj = ()
+faj = []
 mouse_cursor = ((win.get_width() - l.get_width())/2, (win.get_height() - l.get_height())/2)
 min_max = [300, 0]
 while True:
@@ -237,7 +245,9 @@ while True:
         for obj in objects:
             if obj.rect.colliderect(camera.rect):
                 obj.draw()
-    faj = otr()
+    faj = []
+    #faj = otr()
+    [recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)]
     #[obj.draw() for obj in objects if obj.rect.colliderect(camera.rect)]
     #map(.draw, filter(lambda obj: obj.rect.colliderect(camera.rect), objects))
     player.draw()
@@ -261,5 +271,5 @@ while True:
     #win.blit(fail[4], (0, 0))
     #pg.display.update()
     pg.display.flip() ##    = pg.display.update()
-    clock.tick(200)
+    clock.tick(300)
     pg.time.wait(1)

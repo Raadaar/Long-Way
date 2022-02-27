@@ -30,7 +30,7 @@ class spreadsheet:
             else:
                 b = i(b)
         return b
-    
+    # self.start_coordinates=(560, 75), self.moving_coordinates=(285, 25), self.p1=(1360, 500)
     def draw(self):
         if self.ak == True:
             kol_pr = self.p
@@ -59,12 +59,12 @@ x = (
     (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Quests.png").convert_alpha()), ),
     (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Equipment.png").convert_alpha()), (
         (('Низ', 'Верх'), 8),
-        (spreadsheet(s=men_os, s_r=ram_cn, n_r=(484, 0), p_r=(136, 28), g_r=(1360, 768), tab=iventar.sorti(pleeer.equipment['Голова']), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, pleeer.equipment['Голова'])), ), )),
+        (spreadsheet(s=men_os, s_r=ram_cn, n_r=(484, 0), p_r=(136, 28), g_r=(1360, 768), tab=((pleeer.equipment, iventar.sorti), 'Голова'), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, pleeer.equipment['Голова'])), ), )),
     (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Saving.png").convert_alpha()), ),
     (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Loading.png").convert_alpha()), ),
     (spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Exit.png").convert_alpha()), )
 )
-
+# iventar.sorti(pleeer.equipment['Голова']) ((pleeer.equipment, iventar.sorti), 'Голова')
 men_ = spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Back.png").convert_alpha(),
                 s_r=pg.image.load(script.guide.path + "\\aset\\men\\ramka.png").convert_alpha(),
                 n_r=(400, 400), p_r=(10, 10), g_r=(800, 800))
