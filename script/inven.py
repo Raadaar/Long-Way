@@ -19,7 +19,7 @@ class inventory_class:
         else:
             sor = (thing, )
         if isinstance(uslow, equipment):
-            sort_spik = [d for d in [i for i in self.inventory if isinstance(i[0], equipment)] if d[0].kind == uslow.kind or isinstance(d[0], arms) and isinstance(d[0], uslow)] # В первом кругу проверяется является ли предмет снарежением, во втором является ли вид снарежение одинаковым, если это не оружие
+            sort_spik = [d for d in [i for i in self.inventory if isinstance(i[0], equipment)] if d[0].kind == uslow.kind] # В первом кругу проверяется является ли предмет снарежением, во втором является ли вид снарежение одинаковым, если это не оружие
         elif uslow == '':
             return sort_spik
         else:
@@ -39,27 +39,18 @@ class inventory_class:
             self.inventory.append(pr)
     # Отрисовывает название вещей в инвенторе
     def otrisovka(self, spis):
-        visata = 93
-        dlina = 350
+        visata = 75
+        dlina = 275
         perexod = 0
         for i in spis:
             perexod += 1
-            if perexod == 3:
-                dlina -= 10
-            win.blit(f1.render(str(i[0].title), True, (180, 0, 0)), (dlina, visata)) 
-            dlina += 300
-            if perexod == 1:
-                dlina += 15
-            elif perexod == 3:
-                dlina -= 20
+            dlina += 285
+            win.blit(f1.render(str(i[0].title), True, (180, 0, 0)), (dlina, visata))             
             win.blit(f1.render(str(i[1]), True, (180, 0, 0)), (dlina, visata))            
-            dlina += 65
-            if perexod == 1:
-                dlina -= 15
-            elif perexod == 3:
+            if perexod == 3:
                 perexod = 0
                 visata += 25
-                dlina = 350
+                dlina = 275
 predmeti = (('Яблоко', 'Еда', 3), ('Хлеб', 'Еда', 4),
             ('Ржавый мечь новичка', 'Оружие', [(('Атака', 3), ('Ловкость', 2)), (("Попадание", -5), ('Критическое', -5)), (('', ''), ('', ''))]),
             ('Ножик', 'Оружие', [(('Атака', 2), ('Ловкость', 1), ('Сноровка', 1)), (('Критическое', 5), ('Уворот', 5)), (('', ''), ('', ''))]),

@@ -222,8 +222,6 @@ while  1:
     #win.blit(text1, (50, 600))
     for i in men_list:
         ost_pyt = i.spis
-        for d in i.pyt:
-            ost_pyt = ost_pyt[d]
         if i.aktv == True:
             men_ive_gl = True 
 

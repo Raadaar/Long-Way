@@ -1,4 +1,5 @@
 from script.player_modile import *
+
 class thing: # Предмет
     list_of_items = {}
     '''
@@ -66,6 +67,8 @@ class equipment(thing): # Снарежение
     def __init__(self, kind, title='', ataka=0, pro=0, mag=0, wil=0, agil=0, dext=0, accuracy=0, critic=0, dodg=0, mag_dodge=0, counte_str=0, counte_str_mag=0, cru=0, cu=0, pie=0, sh_l=0, sh_h=0, ea=0, wa=0, fi=0, ai=0, lig=0, da=0):
         super().__init__(title, ataka, pro, mag, wil, agil, dext, accuracy, critic, dodg, mag_dodge, counte_str, counte_str_mag, cru, cu, pie, sh_l, sh_h, ea, wa, fi, ai, lig, da)
         self.kind = kind # Вид/класс 
+    def check_for_availability(self):
+        pass
     def derivation_of_characteristics(self): # Вывод характеристик на экран
         pass
 class armor(equipment): # Броня/снарежение
@@ -77,12 +80,15 @@ class armor(equipment): # Броня/снарежение
         if reverse_application == False:
             name_obj.MaxMP += self.MaxMP
             name_obj.MaxMP += self.MaxMP
+            past_subject = name_obj.equipment[self.kind]
+            name_obj.equipment[self.kind] = self
             for key in self.specifications.keys():
                 name_obj.specifications[key] += self.specifications[key]
             for key in self.chances.keys():
                 name_obj.chances[key] += self.chances[key]
             for key in self.resistance.keys():
                 name_obj.resistance[key] += self.resistance[key]
+            return past_subject
         else:
             name_obj.MaxMP -= self.MaxMP
             name_obj.MaxMP -= self.MaxMP
@@ -101,12 +107,15 @@ class ring(equipment):
         if reverse_application == False:
             name_obj.MaxMP += self.MaxMP
             name_obj.MaxMP += self.MaxMP
+            past_subject = name_obj.equipment[self.kind + '_0']
+            name_obj.equipment[self.kind + '_0'] = self
             for key in self.specifications.keys():
                 name_obj.specifications[key] += self.specifications[key]
             for key in self.chances.keys():
                 name_obj.chances[key] += self.chances[key]
             for key in self.resistance.keys():
                 name_obj.resistance[key] += self.resistance[key]
+            return past_subject
         else:
             name_obj.MaxMP -= self.MaxMP
             name_obj.MaxMP -= self.MaxMP
@@ -117,16 +126,28 @@ class ring(equipment):
             for key in self.resistance.keys():
                 name_obj.resistance[key] -= self.resistance[key] 
 class arms(equipment): # Оружие/снарежение
-    def __init__(self, kind, title='', ataka=0, pro=0, mag=0, wil=0, agil=0, dext=0, accuracy=0, critic=0, dodg=0, mag_dodge=0, counte_str=0, counte_str_mag=0, cru=0, cu=0, pie=0, sh_l=0, sh_h=0, ea=0, wa=0, fi=0, ai=0, lig=0, da=0):
+    def __init__(self, kind, title='', ataka=0, pro=0, mag=0, wil=0, agil=0, dext=0, accuracy=0, critic=0, dodg=0, mag_dodge=0, counte_str=0, counte_str_mag=0, cru=0, cu=0, pie=0, sh_l=0, sh_h=0, ea=0, wa=0, fi=0, ai=0, lig=0, da=0, interaction_type='одноручное'):
         super().__init__(kind, title, ataka, pro, mag, wil, agil, dext, accuracy, critic, dodg, mag_dodge, counte_str, counte_str_mag, cru, cu, pie, sh_l, sh_h, ea, wa, fi, ai, lig, da)
+        self.interaction_type = interaction_type
     def using(self, name_obj, reverse_application=False):
         if reverse_application == False:
+            past_subject = name_obj.equipment[self.kind + '_0']
+            if self.interaction_type == 'одноручное':
+                if name_obj.equipment[self.kind + '_0'] in ('одноручное', ''):
+                    name_obj.equipment[self.kind + '_0'] = self
+                else:
+                    name_obj.equipment[self.kind + '_0'] = self
+                    name_obj.equipment[self.kind + '_1'] = ''
+            elif self.interaction_type == 'двухручное':
+                name_obj.equipment[self.kind + '_0'] = self
+                name_obj.equipment[self.kind + '_1'] = self
             for key in self.specifications.keys():
                 name_obj.specifications[key] += self.specifications[key]
             for key in self.chances.keys():
                 name_obj.chances[key] += self.chances[key]
             for key in self.resistance.keys():
                 name_obj.resistance[key] += self.resistance[key]
+            return past_subject
         else:
             for key in self.specifications.keys():
                 name_obj.specifications[key] -= self.specifications[key]
@@ -157,7 +178,7 @@ def converting_things_from_text_format_to_game_class(ite):
                 item_class_dictionary[index_dictionary.index(sel[0])] = int(sel[1])
             else:
                 print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в предмете {ite[0]}')
-        arms(kind=ite[1].split('/')[1],title=ite[0], ataka=item_class_dictionary[0], pro=item_class_dictionary[1], mag=item_class_dictionary[2], wil=item_class_dictionary[3], agil=item_class_dictionary[4], dext=item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22])
+        arms(kind=ite[1].split('/')[0],title=ite[0], interaction_type=ite[1].split('/')[1], ataka=item_class_dictionary[0], pro=item_class_dictionary[1], mag=item_class_dictionary[2], wil=item_class_dictionary[3], agil=item_class_dictionary[4], dext=item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22])
     elif 'Броня' in ite[1]:
         li = ['Максимальное количество здоровья', 'Максимальное количество магии']
         index_dictionary.extend(li)
