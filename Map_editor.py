@@ -1,9 +1,7 @@
-import re
 import sys
 import pygame as pg
 import os
 from datetime import datetime
-
 
 
 cr_data = datetime.now().second
@@ -64,8 +62,6 @@ class sam_object:
     def __init__(self, x, y, width, height):
         self.rect = pg.Rect(x, y, width, height)
     def draw(self):
-        ##  Чтобы отрисовка соответствовала позиции объекта его нужно отрисовывать
-        ##  на self.rect[0]-camera.rect[0], self.rect[1]-camera.rect[1]
         pg.draw.rect(win, (255, 0, 0), (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], self.rect[2], self.rect[3]))
     def vns(self):
         print('f')

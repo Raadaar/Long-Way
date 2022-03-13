@@ -224,15 +224,18 @@ while  1:
         ost_pyt = i.spis
         if i.aktv == True:
             men_ive_gl = True 
-
-            win.blit(ost_pyt[i.ataw][0].sprait, (0, 0))
-            if ost_pyt[i.ataw][0].ak != None:
-                ost_pyt[i.ataw][0].prin_tab(ost_pyt[i.ataw][0].table_list)
-            if ost_pyt[i.ataw][0].ak == True:
-                ost_pyt[i.ataw][0].draw()
-        elif ost_pyt[i.ataw][0].inactive_display != '':
-            ost_pyt[i.ataw][0].inactive_display[0](ost_pyt[i.ataw][0].inactive_display[1])
-
+            ost_pyt[i.ataw][0].output()
+            if False:
+                active_menu = ost_pyt[i.ataw][0]
+                win.blit(active_menu.sprait, (0, 0))
+                if active_menu.ak != None:
+                    active_menu.prin_tab(active_menu.table_list)
+                if active_menu.ak == True:
+                    active_menu.draw()
+                if active_menu.inactive_display != '':
+                    active_menu.inactive_display[0](active_menu.inactive_display[1])
+                if active_menu.additional_functionality != '':
+                    [ad_fun() for ad_fun in active_menu.additional_functionality]
     # проверка, ативированно ли меню снарежения
     if men_sn[0] == True:
         obw_od.rendering_interface(pleeer.items.values())

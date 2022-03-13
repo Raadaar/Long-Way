@@ -6,7 +6,7 @@ from script.player_modile import pleeer
 from script.modile_interface import showing_properties, gr
 ramka_inventar = pg.image.load(script.guide.path + "\\aset\\men\\ramka_inven.png").convert_alpha()
 class spreadsheet:
-    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=[]) -> None:
+    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=[], additional_functionality=(), additional_value=()) -> None:
         self.sprait = s # Спрайт
         self.sprait_ram = s_r # Спрайт рамки
         self.start_coordinates = n_r # Начальные координаты рамки
@@ -17,8 +17,10 @@ class spreadsheet:
         self.list_getting_table = tab # Таблица с которой надо работать ((преобразующие функии/словари), начальный аргумент)
         self.prin_tab = prin_tab # Принцип отрисовки таблицы
         self.ak = False # Активность таблицы
+        self.additional_functionality = additional_functionality
         self.dop_ot = dop_ot
-        self.inactive_display = ''
+        self.inactive_display = inactive_display
+        self.additional_value = additional_value
         if s_r == '':
             self.ak = None
     @property
@@ -36,8 +38,11 @@ class spreadsheet:
         if self.ak == True:
             kol_pr = self.p
             y = self.start_coordinates[1]
-            while kol_pr >= 3:
-                kol_pr -= 3
+            number_cells_length = (self.p1[0] - self.start_coordinates[0]) // self.moving_coordinates[0]
+            if number_cells_length <= 0:
+                print('Отрицательное число number_cells_length')
+            while kol_pr >= number_cells_length:
+                kol_pr -= number_cells_length
                 y += self.moving_coordinates[1]
             win.blit(self.sprait_ram, (self.start_coordinates[0] + self.moving_coordinates[0] * kol_pr, y))
     def peredwe(self, kyda):
@@ -46,6 +51,15 @@ class spreadsheet:
         if self.p + slow[kyda] >= 0:
             self.p += slow[kyda]
         print(self.p)
+    def output(self):
+        win.blit(self.sprait, (0, 0))
+        if self.ak != None:
+            self.prin_tab(self.table_list)
+        if self.ak == True:
+            self.draw()
+            [ad_fun((self.table_list, self.p)) for ad_fun in self.additional_functionality]
+        if self.inactive_display != '':
+            self.inactive_display[0](self.inactive_display[1])
 men_os = pg.image.load(script.guide.path + "\\aset\\men\\oc_okn.png").convert_alpha()
 ram_cn = pg.image.load(script.guide.path + "\\aset\\men\\ram_cn.png").convert_alpha()
 x = (
@@ -59,13 +73,13 @@ x = (
         # (s(), ),
         (('Право', 'Лево'), 3),
         (
-            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 0), prin_tab=iventar.otrisovka)
+            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 0), prin_tab=iventar.otrisovka)
         ,), 
         (
-            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 1), prin_tab=iventar.otrisovka)
+            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 1), prin_tab=iventar.otrisovka)
         ,),  
         (
-            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(285, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 2), prin_tab=iventar.otrisovka)
+            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 2), prin_tab=iventar.otrisovka)
         ,)
     )
     ),
@@ -77,8 +91,29 @@ x = (
     (
         (('Низ', 'Верх'), 8),
         (
-            spreadsheet(s=men_os, s_r=ram_cn, n_r=(484, 0), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.sorti, pleeer.equipment), 'Голова'), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, pleeer.equipment['Голова']))
-        ,)
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (armor,'Голова')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Голова')), additional_functionality=(showing_properties,), additional_value=('Голова',))
+        ,),
+        (
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (armor,'Туловище')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Туловище')), additional_functionality=(showing_properties,), additional_value=('Туловище',))
+        ,),
+        (
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (armor,'Ноги')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Ноги')), additional_functionality=(showing_properties,), additional_value=('Ноги',))
+        ,),
+        (
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (arms,'Оружие_0')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Оружие_0')), additional_functionality=(showing_properties,), additional_value=('Оружие_0',))
+        ,),
+        (
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (arms,'Оружие_1')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Оружие_1')), additional_functionality=(showing_properties,), additional_value=('Оружие_1',))
+        ,),
+        (
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (ring,'Кольцо_0')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Кольцо_0')), additional_functionality=(showing_properties,), additional_value=('Кольцо_0',))
+        ,),
+        (
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (ring,'Кольцо_1')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Кольцо_1')), additional_functionality=(showing_properties,), additional_value=('Кольцо_1',))
+        ,),
+        (
+            spreadsheet(s=men_os, s_r=ram_cn, n_r=(0, 484), p_r=(136, 28), g_r=(1360, 768), tab=((iventar.equipment_sorti, ), (ring,'Кольцо_2')), prin_tab=gr.rendering_interface, inactive_display=(showing_properties, (pleeer, 'Кольцо_2')), additional_functionality=(showing_properties,), additional_value=('Кольцо_2',))
+        ,),
     )
     ),
     (
@@ -152,79 +187,28 @@ class meni:
                 choice_number = [i for i in range(len(iventar.inventory)) if iventar.inventory[i][0] == ost_pyt[self.ataw][0].table_list[ost_pyt[self.ataw][0].p][0]][0]
                 iventar.inventory[choice_number][1] = iventar.inventory[choice_number][1] - 1 # Отнимаем от количество
                 if isinstance(iventar.inventory[choice_number][0], equipment): # Если это equipment то using вернёт предмет что был надет
-                    past_subject = iventar.inventory[choice_number][0].using(pleeer)
-                    if past_subject != '':
-                        iventar.dopov([past_subject, 1])
+                    if isinstance(iventar.inventory[choice_number][0], (arms, ring)) and len(ost_pyt[self.ataw][0].additional_value) > 0:
+                        cvb = iventar.inventory[choice_number][0]
+                        past_subject = iventar.inventory[choice_number][0].using(pleeer, place=ost_pyt[self.ataw][0].additional_value)
+                        if isinstance(iventar.inventory[choice_number][0], ring):
+                            if past_subject != '':
+                                past_subject.using(pleeer, reverse_application=True)
+                                iventar.dopov([past_subject, 1])
+                        else:
+                            for i in past_subject:
+                                if i != '':
+                                    i.using(pleeer, reverse_application=True)
+                                    iventar.dopov([i, 1])                               
+                    else:
+                        past_subject = iventar.inventory[choice_number][0].using(pleeer)
+                        if past_subject != '':
+                            past_subject.using(pleeer, reverse_application=True)
+                            iventar.dopov([past_subject, 1])
                 else:
                     iventar.inventory[choice_number][0].using(pleeer) # Используем предмет
                 if iventar.inventory[choice_number][1] == 0:
                     del iventar.inventory[choice_number] # Если количество предметов закончилось, он удаляется из инв
-            print(f'{[f"{i[0].title}/{i[1]}" for i in iventar.inventory]} / {[i.title for i in pleeer.equipment.values() if i != ""]}')
+            #print(f'{[f"{i[0].title}/{i[1]}" for i in iventar.inventory]} / {[i.title for i in pleeer.equipment.values() if i != ""]}')
         else:
             ost_pyt[self.ataw][0].ak = True
-if False:
-    class meni:
-        def __init__(self, spis) -> None:
-            self.spis = spis
-            self.pyt = []
-            self.ataw = 1
-            self.ataw_fun = 0
-            self.aktv = False
-        def fkl(self):
-            ost_pyt = self.spis
-            if len(self.pyt) != 0:
-                for i in self.pyt:
-                    ost_pyt = ost_pyt[i]
-            if ost_pyt[self.ataw][0].ak == True:
-                ost_pyt[self.ataw][0].ak = False
-                ost_pyt[self.ataw][0].p = 1
-            elif self.aktv == False:
-                self.aktv = True
-            else:
-                if len(self.pyt) != 0:
-                    if akt_fn == None:
-                        self.ataw = self.pyt[-2]
-                        self.pyt = self.pyt[:-2]
-                    else:
-                        return None
-                else:
-                    self.aktv = False
-                    return akt_fn
-        def peredwe(self, kyda):
-            ost_pyt = self.spis
-            if len(self.pyt) != 0:
-                for i in self.pyt:
-                    ost_pyt = ost_pyt[i]
-            if ost_pyt[self.ataw][0].ak == True:
-                ost_pyt[self.ataw][0].peredwe(kyda)
-            elif kyda in ost_pyt[0][0]:
-                if kyda == ost_pyt[0][0][0]:
-                    self.ataw += 1
-                    if self.ataw == ost_pyt[0][1] + 1:
-                        self.ataw = 1
-                else:
-                    self.ataw -= 1
-                    if self.ataw == 0:
-                        self.ataw = ost_pyt[0][1]
-
-        def akt(self):
-            ost_pyt = self.spis
-            if len(self.pyt) != 0:
-                for i in self.pyt:
-                    ost_pyt = ost_pyt[i]
-            if ost_pyt[self.ataw][0].ak == None:
-                self.pyt.append(self.ataw)
-                self.pyt.append(1)
-                self.ataw = 1
-            elif ost_pyt[self.ataw][0].ak == True and len(ost_pyt[self.ataw]) == 1:
-                if ost_pyt[self.ataw][0].p - 1 <= len(ost_pyt[self.ataw][0].table_list):
-                    choice_number = [i for i in range(len(iventar.inventory)) if iventar.inventory[i][0] == ost_pyt[self.ataw][0].table_list[ost_pyt[self.ataw][0].p - 1][0]][0]
-                    iventar.inventory[choice_number][1] = iventar.inventory[choice_number][1] - 1
-                    iventar.inventory[choice_number][0].using(pleeer)
-                    if iventar.inventory[choice_number][1] == 0:
-                        del iventar.inventory[choice_number]
-                print(f'Пусто! {[f"{i[0].title}/{i[1]}" for i in iventar.inventory]}')
-            else:
-                ost_pyt[self.ataw][0].ak = True
-#active interface
 inven = meni(x)

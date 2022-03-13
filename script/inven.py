@@ -27,6 +27,12 @@ class inventory_class:
                 if isinstance(it[0], sor):
                     sort_spik.append(it)
         return sort_spik
+    def equipment_sorti(self, pack):
+        sample, subsample = pack
+        if '_' in subsample:
+            pass
+        subsample = subsample[:subsample.find('_')] if '_' in subsample else subsample
+        return [i for i in self.inventory if isinstance(i[0], sample) and i[0].kind == subsample]
     # Добовляет предмет в инвентарь, если такой уже есть, добовляет к количеству существующего
     def dopov(self, pr):
         prov = False
@@ -46,7 +52,7 @@ class inventory_class:
             perexod += 1
             dlina += 285
             win.blit(f1.render(str(i[0].title), True, (180, 0, 0)), (dlina, visata))             
-            win.blit(f1.render(str(i[1]), True, (180, 0, 0)), (dlina, visata))            
+            win.blit(f1.render(str(i[1]), True, (180, 0, 0)), (dlina + 220, visata))            
             if perexod == 3:
                 perexod = 0
                 visata += 25

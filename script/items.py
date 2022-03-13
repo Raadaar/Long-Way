@@ -103,12 +103,17 @@ class ring(equipment):
         super().__init__(kind, title, ataka, pro, mag, wil, agil, dext, accuracy, critic, dodg, mag_dodge, counte_str, counte_str_mag, cru, cu, pie, sh_l, sh_h, ea, wa, fi, ai, lig, da)
         self.MaxMP = maxmp
         self.MaxHP = maxhp
-    def using(self, name_obj, reverse_application=False):
+    def using(self, name_obj, reverse_application=False, place=False):
         if reverse_application == False:
             name_obj.MaxMP += self.MaxMP
             name_obj.MaxMP += self.MaxMP
-            past_subject = name_obj.equipment[self.kind + '_0']
-            name_obj.equipment[self.kind + '_0'] = self
+            if place == False:
+                past_subject = name_obj.equipment[self.kind + '_0']
+                name_obj.equipment[self.kind + '_0'] = self
+            else:
+                place = place[0]
+                past_subject = name_obj.equipment[place]
+                name_obj.equipment[place] = self
             for key in self.specifications.keys():
                 name_obj.specifications[key] += self.specifications[key]
             for key in self.chances.keys():
@@ -129,24 +134,50 @@ class arms(equipment): # Оружие/снарежение
     def __init__(self, kind, title='', ataka=0, pro=0, mag=0, wil=0, agil=0, dext=0, accuracy=0, critic=0, dodg=0, mag_dodge=0, counte_str=0, counte_str_mag=0, cru=0, cu=0, pie=0, sh_l=0, sh_h=0, ea=0, wa=0, fi=0, ai=0, lig=0, da=0, interaction_type='одноручное'):
         super().__init__(kind, title, ataka, pro, mag, wil, agil, dext, accuracy, critic, dodg, mag_dodge, counte_str, counte_str_mag, cru, cu, pie, sh_l, sh_h, ea, wa, fi, ai, lig, da)
         self.interaction_type = interaction_type
-    def using(self, name_obj, reverse_application=False):
+    def using(self, name_obj, reverse_application=False, place=False):
         if reverse_application == False:
-            past_subject = name_obj.equipment[self.kind + '_0']
-            if self.interaction_type == 'одноручное':
-                if name_obj.equipment[self.kind + '_0'] in ('одноручное', ''):
+            if place == False:
+                past_subject = name_obj.equipment[self.kind + '_0']
+                if self.interaction_type == 'одноручное':
+                    if name_obj.equipment[self.kind + '_0'] in ('одноручное', ''):
+                        name_obj.equipment[self.kind + '_0'] = self
+                    else:
+                        name_obj.equipment[self.kind + '_0'] = self
+                        name_obj.equipment[self.kind + '_1'] = ''
+                elif self.interaction_type == 'двухручное':
+                    past_subject = [name_obj.equipment[self.kind + '_0'], name_obj.equipment[self.kind + '_1']]
                     name_obj.equipment[self.kind + '_0'] = self
-                else:
+                    name_obj.equipment[self.kind + '_1'] = self
+            else:
+                place = place[0]
+                if self.interaction_type == 'двухручное':
+                    if name_obj.equipment[self.kind + '_0'] != '' and name_obj.equipment[self.kind + '_1'] != '':
+                        if name_obj.equipment[self.kind + '_0'].interaction_type == 'двухручное' and name_obj.equipment[self.kind + '_1'].interaction_type == 'двухручное':
+                            past_subject = name_obj.equipment[self.kind + '_0']
+                    else:
+                        past_subject = [name_obj.equipment[self.kind + '_0'], name_obj.equipment[self.kind + '_1']]
                     name_obj.equipment[self.kind + '_0'] = self
-                    name_obj.equipment[self.kind + '_1'] = ''
-            elif self.interaction_type == 'двухручное':
-                name_obj.equipment[self.kind + '_0'] = self
-                name_obj.equipment[self.kind + '_1'] = self
+                    name_obj.equipment[self.kind + '_1'] = self
+                elif self.interaction_type == 'одноручное':
+                    if name_obj.equipment[self.kind + '_0'] != '' and name_obj.equipment[self.kind + '_0'].interaction_type == 'двухручное':
+                        past_subject = name_obj.equipment[self.kind + '_0'] 
+                        name_obj.equipment[self.kind + '_0'] = ''
+                        name_obj.equipment[self.kind + '_1'] = ''
+                        name_obj.equipment[place] = self
+                    else:
+                        past_subject = name_obj.equipment[place]
+                        name_obj.equipment[place] = self
             for key in self.specifications.keys():
                 name_obj.specifications[key] += self.specifications[key]
             for key in self.chances.keys():
                 name_obj.chances[key] += self.chances[key]
             for key in self.resistance.keys():
                 name_obj.resistance[key] += self.resistance[key]
+            print(past_subject)
+            if place != False:
+                if isinstance(past_subject, list):
+                    return past_subject
+                return [past_subject, ]
             return past_subject
         else:
             for key in self.specifications.keys():
