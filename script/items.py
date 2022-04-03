@@ -15,7 +15,7 @@ class thing: # Предмет
         [self.specifications.pop(i, None) for i in list(filter(lambda x: self.specifications[x] == 0, self.specifications.keys()))]
         self.chances = {"Попадание": accuracy, 'Критическое': critic, 'Уворот': dodg, 'Магический уворот': mag_dodge, 'Контр атака': counte_str, 'Контр заклинание': counte_str_mag}
         [self.chances.pop(i, None) for i in list(filter(lambda x: self.chances[x] == 0, self.chances.keys()))]
-        self.resistance = {'Дробящий': cru, 'Режущий': cu, 'Пронзающий': pie, 'Стрелковый лёгкий': sh_l, 'Стрелковый тяжолый': sh_h, 'Земленой': ea, 'Водный': wa, 'Огненый': fi, 'Воздушный': ai, 'Святой': lig, 'Тёмный': da} 
+        self.resistance = {'Дробящий': cru, 'Режущий': cu, 'Пронзающий': pie, 'Стрелковый лёгкий': sh_l, 'Стрелковый тяжелый': sh_h, 'Земляной': ea, 'Водный': wa, 'Огненный': fi, 'Воздушный': ai, 'Святой': lig, 'Тёмный': da} 
         [self.resistance.pop(i, None) for i in list(filter(lambda x: self.resistance[x] == 0, self.resistance.keys()))]
 class food(thing): # Еда
     def __init__(self, title, mp=0, hp=0) -> None:
@@ -189,7 +189,7 @@ class arms(equipment): # Оружие/снарежение
 def converting_things_from_text_format_to_game_class(ite):
     index_dictionary = ['Атака', 'Защита', 'Магия', 'Воля', 'Ловкость', 'Сноровка',
                         "Попадание", 'Критическое', 'Уворот', 'Магический уворот', 'Контр атака', 'Контр заклинание',
-                        'Дробящий', 'Режущий', 'Пронзающий', 'Стрелковый лёгкий', 'Стрелковый тяжолый', 'Земленой', 'Водный', 'Огненый', 'Воздушный', 'Святой', 'Тёмный']
+                        'Дробящий', 'Режущий', 'Пронзающий', 'Стрелковый лёгкий', 'Стрелковый тяжелый', 'Земляной', 'Водный', 'Огненный', 'Воздушный', 'Святой', 'Тёмный']
     item_class_dictionary = [0 for _ in range(27)]
     if ite[1] == 'Зелье':
         li = ['Maна', 'Здоровье', 'Длительность']

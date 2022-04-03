@@ -64,6 +64,21 @@ class Pleeer:
                         'Кольцо_0': '',
                         'Кольцо_1': '', 
                         'Кольцо_2': ''}
+    def state_transition(self):
+        for pak in self.condition:
+            if pak[0] in ('баф', 'дебаф'):
+                if pak[2] > 0:
+                    pak[2] -= 1
+                else:
+                    pak[1](self, False)
+                    del self.condition[self.condition.index(pak)]
+            elif pak[0] in ('наполнение', 'урон'):
+                if pak[2] > 0:
+                    pak[2] -= 1
+                    pak[1](self)
+                else:
+                    pak[1](self)
+                    del self.condition[self.condition.index(pak)]
     def state_step(self):
         for creature in self.condition:
             creature.duration -= 1

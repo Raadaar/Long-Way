@@ -4,10 +4,13 @@ import script.guide
 from script.inven import *
 from script.player_modile import pleeer
 from script.modile_interface import showing_properties, gr
+from script.enemy import *
+from script.skill import *
 ramka_inventar = pg.image.load(script.guide.path + "\\aset\\men\\ramka_inven.png").convert_alpha()
 class spreadsheet:
-    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=[], additional_functionality=(), additional_value=()) -> None:
+    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=[], additional_functionality=(), additional_value=(), dop_sprai=['', (0,0)], additional_tap=lambda x: x) -> None:
         self.sprait = s # Спрайт
+        self.dop_spait = dop_sprai
         self.sprait_ram = s_r # Спрайт рамки
         self.start_coordinates = n_r # Начальные координаты рамки
         self.moving_coordinates = p_r # координаты передвежения рамки
@@ -21,6 +24,8 @@ class spreadsheet:
         self.dop_ot = dop_ot
         self.inactive_display = inactive_display
         self.additional_value = additional_value
+        self.additional_key = False
+        self.additional_tap = additional_tap
         if s_r == '':
             self.ak = None
     @property
@@ -46,13 +51,18 @@ class spreadsheet:
                 y += self.moving_coordinates[1]
             win.blit(self.sprait_ram, (self.start_coordinates[0] + self.moving_coordinates[0] * kol_pr, y))
     def peredwe(self, kyda):
-        x = (self.start_coordinates[0] - self.p1[0]) // self.moving_coordinates[0]
-        slow = {'Низ': -x, 'Верх': x, 'Право': 1, 'Лево': -1}
-        if self.p + slow[kyda] >= 0:
-            self.p += slow[kyda]
-        print(self.p)
+        if self.additional_key == True:
+            self.additional_tap(kyda)
+        else:
+            x = (self.start_coordinates[0] - self.p1[0]) // self.moving_coordinates[0]
+            slow = {'Низ': -x, 'Верх': x, 'Право': 1, 'Лево': -1}
+            if self.p + slow[kyda] >= 0:
+                self.p += slow[kyda]
+            print(self.p)
     def output(self):
         win.blit(self.sprait, (0, 0))
+        if self.dop_spait[0] != '':
+            win.blit(self.dop_spait[0], self.dop_spait[1])
         if self.ak != None:
             self.prin_tab(self.table_list)
         if self.ak == True:
@@ -182,7 +192,7 @@ class meni:
             self.pyt.append(self.ataw)
             self.pyt.append(1)
             self.ataw = 1
-        elif ost_pyt[self.ataw][0].ak == True and len(ost_pyt[self.ataw]) == 1:
+        elif ost_pyt[self.ataw][0].ak == True and len(ost_pyt[self.ataw]) == 1 and inven.aktv == True:
             if ost_pyt[self.ataw][0].p - 1 <= len(ost_pyt[self.ataw][0].table_list):
                 choice_number = [i for i in range(len(iventar.inventory)) if iventar.inventory[i][0] == ost_pyt[self.ataw][0].table_list[ost_pyt[self.ataw][0].p][0]][0]
                 iventar.inventory[choice_number][1] = iventar.inventory[choice_number][1] - 1 # Отнимаем от количество
@@ -209,6 +219,34 @@ class meni:
                 if iventar.inventory[choice_number][1] == 0:
                     del iventar.inventory[choice_number] # Если количество предметов закончилось, он удаляется из инв
             #print(f'{[f"{i[0].title}/{i[1]}" for i in iventar.inventory]} / {[i.title for i in pleeer.equipment.values() if i != ""]}')
+        elif battle.aktv == True:
+            if self.ataw == 1:
+                if ost_pyt[self.ataw][0].additional_key == True:
+                    ost_pyt[self.ataw][0].additional_key = False
+                else:
+                    ost_pyt[self.ataw][0].additional_key = True
         else:
             ost_pyt[self.ataw][0].ak = True
 inven = meni(x)
+men_batlle_ram = pg.image.load(script.guide.path + "\\aset\\men\\ramka_g_m_b.png").convert_alpha()
+men_batlle = pg.image.load(script.guide.path + "\\aset\\men\\oc_m_b.png").convert_alpha()
+battle = meni(
+    (
+    (('Низ', 'Верх'), 5),
+    (
+        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 564)]),
+    ),
+    (
+        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 604)]),
+    ),
+    (
+        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 644)]),
+    ),
+    (
+        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 684)]),
+    ),
+    (
+        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 724)]),
+    ),
+    )
+    )
