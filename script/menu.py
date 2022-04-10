@@ -3,12 +3,15 @@ import script.guide
 # script.guide.path
 from script.inven import *
 from script.player_modile import pleeer
-from script.modile_interface import showing_properties, gr
+from script.modile_interface import showing_properties, gr, display_abilities
 from script.enemy import *
 from script.skill import *
 ramka_inventar = pg.image.load(script.guide.path + "\\aset\\men\\ramka_inven.png").convert_alpha()
+pati = [pleeer, ]
+pleeer.spells.append(class_magic.magic_dictionary['Водный поток'])
+pleeer.spells.append(class_magic.magic_dictionary['Святое проклятье'])
 class spreadsheet:
-    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=[], additional_functionality=(), additional_value=(), dop_sprai=['', (0,0)], additional_tap=lambda x: x) -> None:
+    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=lambda x: x, additional_functionality=(), additional_value=(), dop_sprai=['', (0,0)], additional_tap=lambda x: x, ak = False) -> None:
         self.sprait = s # Спрайт
         self.dop_spait = dop_sprai
         self.sprait_ram = s_r # Спрайт рамки
@@ -19,7 +22,7 @@ class spreadsheet:
         self.p2 = '' # Границф
         self.list_getting_table = tab # Таблица с которой надо работать ((преобразующие функии/словари), начальный аргумент)
         self.prin_tab = prin_tab # Принцип отрисовки таблицы
-        self.ak = False # Активность таблицы
+        self.ak = ak # Активность таблицы
         self.additional_functionality = additional_functionality
         self.dop_ot = dop_ot
         self.inactive_display = inactive_display
@@ -28,13 +31,17 @@ class spreadsheet:
         self.additional_tap = additional_tap
         if s_r == '':
             self.ak = None
+            if ak == True:
+                self.ak = False
     @property
     def table_list(self): # Нужно для состовления нужного списка для таблицы
         x = self.list_getting_table[0]
         b = self.list_getting_table[1]
         for i in x:
-            if isinstance(i, dict):
+            if isinstance(i, dict) and b != False:
                 b = i[b]
+            elif b == False:
+                b = i
             else:
                 b = i(b)
         return b
@@ -60,11 +67,13 @@ class spreadsheet:
                 self.p += slow[kyda]
             print(self.p)
     def output(self):
+        self.dop_ot('')
         win.blit(self.sprait, (0, 0))
         if self.dop_spait[0] != '':
             win.blit(self.dop_spait[0], self.dop_spait[1])
-        if self.ak != None:
-            self.prin_tab(self.table_list)
+        if self.sprait_ram != '':
+            if self.ak != None:
+                self.prin_tab(self.table_list)
         if self.ak == True:
             self.draw()
             [ad_fun((self.table_list, self.p)) for ad_fun in self.additional_functionality]
@@ -157,10 +166,12 @@ class meni:
         return ost_pyt        
     def fkl(self):
         ost_pyt = self.spis
-        if ost_pyt[self.ataw][0].ak == True:
+        if ost_pyt[self.ataw][0].additional_key == True:
+            ost_pyt[self.ataw][0].additional_key = False
+        elif ost_pyt[self.ataw][0].ak == True:
             ost_pyt[self.ataw][0].ak = False
             ost_pyt[self.ataw][0].p = 1
-        elif self.aktv == False:
+        elif self.aktv == False and sum(i.aktv for i in men_list) == 0:
             self.aktv = True
         else:
             if len(self.pyt) != 0:
@@ -219,25 +230,47 @@ class meni:
                 if iventar.inventory[choice_number][1] == 0:
                     del iventar.inventory[choice_number] # Если количество предметов закончилось, он удаляется из инв
             #print(f'{[f"{i[0].title}/{i[1]}" for i in iventar.inventory]} / {[i.title for i in pleeer.equipment.values() if i != ""]}')
-        elif battle.aktv == True:
+        elif battle_men.aktv == True:
             if self.ataw == 1:
                 if ost_pyt[self.ataw][0].additional_key == True:
+                    self.pyt = []
+                    self.ataw = 1
                     ost_pyt[self.ataw][0].additional_key = False
+                    batlee.enemy_list[batlee.choise].HP -= pleeer.specifications['Атака']
+                    batlee.bat(pati)
                 else:
                     ost_pyt[self.ataw][0].additional_key = True
+            elif self.ataw == 2:
+                if ost_pyt[self.ataw][0].ak == False:
+                    ost_pyt[self.ataw][0].ak = True
+                elif ost_pyt[self.ataw][0].ak == True and ost_pyt[self.ataw][0].additional_key == False:
+                    ost_pyt[self.ataw][0].additional_key = True
+                elif ost_pyt[self.ataw][0].ak == True and ost_pyt[self.ataw][0].additional_key == True:
+                    if ost_pyt[self.ataw][0].p < len(pleeer.spells):
+                        self.pyt = []
+                        self.ataw = 1
+                        ost_pyt[self.ataw][0].additional_key = False
+                        ost_pyt[self.ataw][0].p = 0
+                        ost_pyt[self.ataw][0].ak == False
+                        pleeer.spells[ost_pyt[self.ataw][0].p].using(pleeer, pati, batlee.enemy_list, batlee.enemy_list[batlee.choise])
+                        batlee.bat(pati)   
+
+
         else:
             ost_pyt[self.ataw][0].ak = True
 inven = meni(x)
 men_batlle_ram = pg.image.load(script.guide.path + "\\aset\\men\\ramka_g_m_b.png").convert_alpha()
+men_batlle_v = pg.image.load(script.guide.path + "\\aset\\men\\ramka_p_sc.png").convert_alpha()
 men_batlle = pg.image.load(script.guide.path + "\\aset\\men\\oc_m_b.png").convert_alpha()
-battle = meni(
+battle_men = meni(
     (
     (('Низ', 'Верх'), 5),
     (
-        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 564)]),
+        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 564)], additional_tap=script.enemy.batlee.peredv, dop_ot=script.enemy.batlee.maping, ak=True),
+        #spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 2), prin_tab=iventar.otrisovka)
     ),
     (
-        spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 604)]),
+        spreadsheet(s=men_batlle, s_r=men_batlle_v, dop_sprai=[men_batlle_ram, (0, 604)], additional_tap=script.enemy.batlee.peredv, dop_ot=script.enemy.batlee.maping, n_r=(160, 564), p_r=(300, 20), g_r=(1360, 768), prin_tab=display_abilities.rendering_interface, tab=((pleeer.spells, ), False)),
     ),
     (
         spreadsheet(s=men_batlle, dop_sprai=[men_batlle_ram, (0, 644)]),
@@ -250,3 +283,4 @@ battle = meni(
     ),
     )
     )
+men_list = [inven, battle_men]

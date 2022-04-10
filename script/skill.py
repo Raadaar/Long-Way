@@ -94,7 +94,7 @@ class class_ability(skill):
     ability_dictionary = {}
     def __init__(self, title, application, action, dam, consumption, time=0, view='') -> None:
         super().__init__(title, application, action, dam, time, view)
-        class_ability.ability_dictionary [self.title] = self
+        class_ability.ability_dictionary[self.title] = self
         self.consumption = consumption # Потребление очков способности
     def using(self, utilizing, command, host, choice):
         utilizing.SP = utilizing.SP - self.consumption if utilizing.SP - self.consumption >= 0 else 0
@@ -123,9 +123,9 @@ def converting_text_to_skill(skil):
         s = i.split('/')
         sl[s[0]] = int(s[1])
     if skil[3][0] == 'м':
-        class_magic(skil[0], skil[1], skil[2], sl, skil[3].split('/')[1], time=tim, view=view)
+        class_magic(skil[0], skil[1], skil[2], sl, int(skil[3].split('/')[1]), time=tim, view=view)
     else:
-        class_ability(skil[0], skil[1], skil[2], sl, skil[3].split('/')[1], time=tim, view=view)
+        class_ability(skil[0], skil[1], skil[2], sl, int(skil[3].split('/')[1]), time=tim, view=view)
 # script/
 with open('script/skill.txt', 'r', encoding='utf-8') as file:
     for line in file:

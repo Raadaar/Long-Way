@@ -1,3 +1,8 @@
+from datetime import datetime
+cr_data = datetime.now().second
+fps = 0
+fps_pro = 0
+min_max = [300, 0]
 from script.start_game import win, pg, sys, randint, f1
 import script.guide
 # Название игры
@@ -14,8 +19,8 @@ men_iven =  [pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png")
 ramka = pg.image.load(script.guide.path + "\\aset\\men\\ramka.png").convert_alpha()
 
 pleer = pg.image.load(script.guide.path + "\\aset\\pleer.png").convert_alpha()
-battle_sprait_men = [pg.image.load(script.guide.path + "\\aset\\men\\oc_m_b.png").convert_alpha()]
-battle_ramka_g = [pg.image.load(script.guide.path + "\\aset\\men\\ramka_g_m_b.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\ramka_p_sc.png").convert_alpha()]
+battle_men_sprait_men = [pg.image.load(script.guide.path + "\\aset\\men\\oc_m_b.png").convert_alpha()]
+battle_men_ramka_g = [pg.image.load(script.guide.path + "\\aset\\men\\ramka_g_m_b.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\ramka_p_sc.png").convert_alpha()]
 vi = pg.image.load(script.guide.path + "\\aset\\men\\vi.png").convert_alpha()
 men_sn_ok = [pg.image.load(script.guide.path + "\\aset\\men\\oc_okn.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn_n.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\dop_okn_v.png").convert_alpha()]
 ramk = pg.image.load(script.guide.path + "\\aset\\men\\ramka_e.png").convert_alpha()
@@ -32,8 +37,7 @@ from script.enemy import *
 for i in thing.list_of_items.values():
     iventar.dopov([i, 1])
 ######################################################
-from script.menu import inven, battle     
-men_list = [inven, battle]
+from script.menu import inven, battle_men, men_list   
 ######################################################
 #
 speed = 5
@@ -52,7 +56,7 @@ frame_coo = [0, 484]
 
 clock = pg.time.Clock()
 #
-battle_cycle = 0
+battle_men_cycle = 0
 # Включает главное меню
 men_ive_gl = False
 # Включает выбор вкладок в инвенторе
@@ -71,9 +75,9 @@ per_re_batl = [False, # Проверка попадает ли игрок в з�
                False, # Происходить атака
                False, # Активируется рамка выбора магии
                False] # Активация магии
-kno_battle = [1, 0]
+kno_battle_men = [1, 0]
 # Список боевых зон
-battle_son = [pg.Rect(0, 0, 300, 300)]
+battle_men_son = [pg.Rect(0, 0, 300, 300)]
 
 frame = 0
 attack_delay = 0
@@ -86,7 +90,12 @@ while  1:
             sys.exit()
         if event.type==pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
-                akt_fn = inven.fkl()
+                if sum(i.aktv for i in men_list) == 0:
+                    akt_fn = inven.fkl()
+                else:
+                    for i in men_list:
+                        if i.aktv == True:
+                            i.fkl()
             if event.key == pg.K_RIGHT:
                 for i in men_list:
                     if i.aktv == True:
@@ -108,7 +117,8 @@ while  1:
                     if i.aktv == True:
                         i.akt()
             if event.key == pg.K_z:
-                print(battle.aktv)  
+                print([i.HP for i in batlee.enemy_list])  
+                print(pleeer.MP, batlee.enemy_list[0].condition)
 
     if men_ive_gl == False: 
         vector = [0, 0]
@@ -133,10 +143,12 @@ while  1:
             vector[0] += speed
         # Вр зоны
         for border in enemy_combat_zone:
-            border = pg.Rect(border.re[0] - 680, border.re[1] - 384, border.re[2], border.re[3])
+            border_test = pg.Rect(border.re[0] - 680, border.re[1] - 384, border.re[2], border.re[3])
             testRect = pg.Rect(player.rect[0], player.rect[1], 40, 40)
-            if testRect.colliderect(border):
-                akt_fn = battle.fkl()
+            if testRect.colliderect(border_test):
+                print(border)
+                border.beginning_battle(batlee)
+                akt_fn = battle_men.fkl()
 
 
         ##  Если игрок ходил
@@ -158,7 +170,7 @@ while  1:
         frame = 0
     # показывает кавадрат на фоне персоонажа, этот же квадрат, показывает границу колизии
     #player.draw()
-    pg.draw.rect(win, (255, 0, 0), (battle_son[0][0] - camera.rect[0], battle_son[0][1] - camera.rect[1], battle_son[0][2], battle_son[0][3]), 2)
+    pg.draw.rect(win, (255, 0, 0), (battle_men_son[0][0] - camera.rect[0], battle_men_son[0][1] - camera.rect[1], battle_men_son[0][2], battle_men_son[0][3]), 2)
     # показывает спрайт персоонажа
     
     # показывает второй уровень пока
@@ -181,7 +193,19 @@ while  1:
             ost_pyt[i.ataw][0].output()
     if sum(i.aktv for i in men_list) == 0:
         men_ive_gl = False
- 
+    fps += 1
+    if fps == 300:
+        fps = 299
+    #win.blit(f0.render(str(fps_pro), True, (23, 128, 109)), (0, 0))
+    nis = datetime.now().second
+    if cr_data != nis:
+        cr_data = nis
+        fps_pro = fps
+        if fps_pro < min_max[0]:
+            min_max[0] = fps_pro
+        elif fps_pro > min_max[1]:
+            min_max[1] = fps_pro
+        fps = 0 
     #win.blit(dre, (50 - camera.rect[0], 600 - camera.rect[1]))
     pg.display.flip() ##    = pg.display.update()
     clock.tick(60)

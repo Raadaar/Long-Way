@@ -1,6 +1,6 @@
 import random
 import copy
-import script.start_game
+import script.start_game as sg
 import script.guide
 from script.skill import skill, class_ability, class_magic
 '''
@@ -14,11 +14,12 @@ from script.skill import skill, class_ability, class_magic
 # Зона боя
 class combat_zone:
     def __init__(self, r, v, s) -> None:
-        self.re = script.start_game.pg.Rect(r) # Площадь
+        self.re = sg.pg.Rect(r) # Площадь
         self.enemis = v # Список врагов
         self.sprait_fon = s # Фоновый спрайт 
-    def beginning_battle(self):        
-        return [self.enemis[random.randint(0, len(self.enemis) - 1)] for _ in range(random.randint(1, len(self.enemis)))] # Даёт случайное количество врагов от одного до бесконечности
+    def beginning_battle(self, sel):        
+        sel.enemy_list = [self.enemis[random.randint(0, len(self.enemis) - 1)] for _ in range(random.randint(1, len(self.enemis)))] # Даёт случайное количество врагов от одного до бесконечности
+        sel.sprait_fon = self.sprait_fon 
 # Активный бой
 class batlee_class:
     def __init__(self) -> None:
@@ -27,16 +28,32 @@ class batlee_class:
         self.choise = 0 # Выбранный враг
     def bat(self, pati):
         for i in self.enemy_list:
-            i.ba(pati)
+            i.state_transition()
     def peredv(self, kyda):
         slow = {'Право': 1, 'Лево': -1}
         if kyda in slow:
-            if self.p + slow[kyda] >= 0:
-                self.p += slow[kyda]
-        def maping(self, d): # mapping
+            if self.choise + slow[kyda] >= 0:
+                self.choise += slow[kyda]
+                if self.choise == len(self.enemy_list):
+                    self.choise = 0
+    def maping(self, _): # mapping       
+        sg.win.blit(self.sprait_fon, (0, 0))
+        p = 1360 // (len(self.enemy_list) + 1)
+        x = 0
+        for enem in self.enemy_list:
+            x += p
+            spr = enemy_class.sprait[enem.name]
+            center = x - (spr.get_width() // 2)
+            sg.win.blit(spr, (center, 100))
+            sg.pg.draw.rect(sg.win, (68, 148, 74), (center + 30, 90, round((enem.HP * (100 / enem.MaxHP)) * ((spr.get_width() - 30) / 100)), 10))
             pass
+        # pg.draw.rect(win, (0, 100, 0), (680, 384, 50, 50))
+        # get_width()
+pati = []
+batlee = batlee_class()
 class enemy_class:
     list_of_enemy = {}
+    sprait = {}
     '''
     Начальный класс
     '''
@@ -46,7 +63,8 @@ class enemy_class:
         cru=100, cu=100, pie=100, sh_l=100, sh_h=100, ea=100, wa=100, fi=100,
         ai = 100, lig = 100, da = 100):
         self.condition = []
-        self.sprait = sprait
+        enemy_class.sprait[name] = sprait
+        self.sprait = ''
         self.name = name
         self.HP = maxhp                      #1 Хп что на данный момент имеется у игрока      
         self.MP = maxmp                      #2 Мана что на данный момент имеется у игрока     
@@ -80,7 +98,11 @@ class enemy_class:
                     del self.condition[self.condition.index(pak)]        
 
     def combat_logic(self, command, host):
-        pass
+        ch = random.choice(['Атака', 'Магия'])
+        if ch == 'Атака':
+            host[0].HP -= self.specifications['Атака']
+        else:
+            random.choice(self.magic).using(self, batlee.enemy_list, pati, host[0])
 def converting_text_to_enemy_class(ite):
     list_skill = []
     index_dictionary = ['Атака', 'Защита', 'Магия', 'Воля', 'Ловкость', 'Сноровка',
@@ -96,7 +118,7 @@ def converting_text_to_enemy_class(ite):
                 print(f'Ошибка №f4Ht неизвестный параметр _:{i}:_ в предмете {ite[0]}')
         elif ite[i] in skill.skill_dictionary.keys():
             list_skill.append(ite[i])
-    enemy_class(ite[0], ite[1], ite[2], ite[3], ite[4], item_class_dictionary[0], item_class_dictionary[1], item_class_dictionary[2], item_class_dictionary[3], item_class_dictionary[4], item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22]) 
+    enemy_class(ite[0], int(ite[1]), int(ite[2]), int(ite[3]), sg.pg.image.load(script.guide.path + f"\\aset\\{ite[4]}").convert_alpha(), item_class_dictionary[0], item_class_dictionary[1], item_class_dictionary[2], item_class_dictionary[3], item_class_dictionary[4], item_class_dictionary[5], accuracy=item_class_dictionary[6], critic=item_class_dictionary[7], dodg=item_class_dictionary[8], mag_dodge=item_class_dictionary[9], counte_str=item_class_dictionary[10], counte_str_mag=item_class_dictionary[11], cru=item_class_dictionary[12], cu=item_class_dictionary[13], pie=item_class_dictionary[14], sh_l=item_class_dictionary[15], sh_h=item_class_dictionary[16], ea=item_class_dictionary[17], wa=item_class_dictionary[18], fi=item_class_dictionary[19], ai=item_class_dictionary[20], lig=item_class_dictionary[21], da=item_class_dictionary[22]) 
     for i in list_skill:
         if isinstance(skill.skill_dictionary[i], class_magic):
             enemy_class.list_of_enemy[ite[0]].magic.append(skill.skill_dictionary[i])
@@ -108,4 +130,5 @@ with open('script/enemy.txt', 'r', encoding='utf-8') as file:
 def life_check(ene):
     pass
 #copy.deepcopy()
-enemy_combat_zone = [combat_zone((0,0,20,20), [enemy_class.list_of_enemy['Злодей'], ], script.start_game.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]
+enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Земляной разлом v2'])
+enemy_combat_zone = [combat_zone((0,0,20,20), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]
