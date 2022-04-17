@@ -57,7 +57,9 @@ class skill:
                     activity_dictionary['баф'](command[i], True)
                     command[i].condition.append([self.action, activity_dictionary['баф'], self.time])
             else:
-                ch = random.randint(0, len(command) - 1)
+                ch = 0
+                if len(command) > 1:
+                    ch = random.randint(0, len(command) - 1)
                 activity_dictionary['баф'](command[ch], True)
                 command[ch].condition.append([self.action, activity_dictionary['баф'], self.time])
         elif self.action == 'дебаф':
@@ -69,7 +71,9 @@ class skill:
                     activity_dictionary['дебаф'](host[i], True)
                     host[i].condition.append([self.action, activity_dictionary['дебаф'], self.time])
             else:
-                ch = random.randint(0, len(host) - 1)
+                ch = 0
+                if len(host) > 1:
+                    ch = random.randint(0, len(host) - 1)
                 activity_dictionary['дебаф'](host[ch], True)
                 host[ch].condition.append([self.action, activity_dictionary['дебаф'], self.time])            
         elif self.action == 'наполнение':
@@ -79,7 +83,9 @@ class skill:
                 for i in range(len(command)):
                     command[i].condition.append([self.action, activity_dictionary['наполнение'], self.time])
             else:
-                ch = random.randint(0, len(command) - 1)
+                ch = 0
+                if len(command) > 1:
+                    ch = random.randint(0, len(command) - 1)
                 command[ch].condition.append([self.action, activity_dictionary['наполнение'], self.time])
         elif self.action == 'урон':
             if self.application == 'урон':
@@ -88,7 +94,9 @@ class skill:
                 for i in range(len(host)):
                     host[i].condition.append([self.action, activity_dictionary['урон'], self.time])
             else:
-                ch = random.randint(0, len(host) - 1)
+                ch = 0
+                if len(host) > 1:
+                    ch = random.randint(0, len(host) - 1)
                 host[ch].condition.append([self.action, activity_dictionary['урон'], self.time])
 class class_ability(skill):
     ability_dictionary = {}

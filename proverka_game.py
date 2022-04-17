@@ -1,8 +1,4 @@
-from datetime import datetime
-cr_data = datetime.now().second
-fps = 0
-fps_pro = 0
-min_max = [300, 0]
+
 from script.start_game import win, pg, sys, randint, f1
 import script.guide
 # Название игры
@@ -37,9 +33,9 @@ from script.enemy import *
 for i in thing.list_of_items.values():
     iventar.dopov([i, 1])
 ######################################################
-from script.menu import inven, battle_men, men_list   
+from script.menu import inven, battle_men, men_list, fps   
 ######################################################
-#
+#beginning_battle
 speed = 5
 #
 kno_m_s = 0
@@ -118,7 +114,7 @@ while  1:
                         i.akt()
             if event.key == pg.K_z:
                 print([i.HP for i in batlee.enemy_list])  
-                print(pleeer.MP, batlee.enemy_list[0].condition)
+                print(pleeer.HP, batlee.enemy_list[0].condition)
 
     if men_ive_gl == False: 
         vector = [0, 0]
@@ -193,19 +189,7 @@ while  1:
             ost_pyt[i.ataw][0].output()
     if sum(i.aktv for i in men_list) == 0:
         men_ive_gl = False
-    fps += 1
-    if fps == 300:
-        fps = 299
-    #win.blit(f0.render(str(fps_pro), True, (23, 128, 109)), (0, 0))
-    nis = datetime.now().second
-    if cr_data != nis:
-        cr_data = nis
-        fps_pro = fps
-        if fps_pro < min_max[0]:
-            min_max[0] = fps_pro
-        elif fps_pro > min_max[1]:
-            min_max[1] = fps_pro
-        fps = 0 
+    fps.output()
     #win.blit(dre, (50 - camera.rect[0], 600 - camera.rect[1]))
     pg.display.flip() ##    = pg.display.update()
     clock.tick(60)

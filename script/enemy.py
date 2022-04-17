@@ -18,7 +18,7 @@ class combat_zone:
         self.enemis = v # Список врагов
         self.sprait_fon = s # Фоновый спрайт 
     def beginning_battle(self, sel):        
-        sel.enemy_list = [self.enemis[random.randint(0, len(self.enemis) - 1)] for _ in range(random.randint(1, len(self.enemis)))] # Даёт случайное количество врагов от одного до бесконечности
+        sel.enemy_list = [copy.deepcopy(self.enemis[random.randint(0, len(self.enemis) - 1)]) for _ in range(random.randint(1, len(self.enemis)))] # Даёт случайное количество врагов от одного до бесконечности
         sel.sprait_fon = self.sprait_fon 
 # Активный бой
 class batlee_class:
@@ -27,8 +27,17 @@ class batlee_class:
         self.sprait_fon = '' # Фоновый спрайт 
         self.choise = 0 # Выбранный враг
     def bat(self, pati):
-        for i in self.enemy_list:
-            i.state_transition()
+        if len(self.enemy_list) > 0:
+            for i in self.enemy_list:
+                i.state_transition()
+                if i.HP < 1:
+                    del self.enemy_list[self.enemy_list.index(i)]
+                else:                
+                    i.combat_logic(self.enemy_list, pati)
+            for i in pati:
+                i.state_transition()
+        else:
+            pass
     def peredv(self, kyda):
         slow = {'Право': 1, 'Лево': -1}
         if kyda in slow:
@@ -36,17 +45,22 @@ class batlee_class:
                 self.choise += slow[kyda]
                 if self.choise == len(self.enemy_list):
                     self.choise = 0
-    def maping(self, _): # mapping       
+    def maping(self, bat, fps): # mapping
+        fps = fps.fps
+        fps = (60 - fps if fps > 30 else fps)
         sg.win.blit(self.sprait_fon, (0, 0))
         p = 1360 // (len(self.enemy_list) + 1)
         x = 0
         for enem in self.enemy_list:
-            x += p
             spr = enemy_class.sprait[enem.name]
+            x += p
             center = x - (spr.get_width() // 2)
-            sg.win.blit(spr, (center, 100))
+            if enem == self.enemy_list[self.choise] and bat.additional_key == True:
+                #sg.win.blit(spr, (center + fps, 100 + fps))
+                sg.win.blit(sg.pg.transform.scale(spr, (spr.get_width() - fps, spr.get_height() - fps)), (center + fps // 2, 100 + fps // 2))
+            else:
+                sg.win.blit(spr, (center, 100))
             sg.pg.draw.rect(sg.win, (68, 148, 74), (center + 30, 90, round((enem.HP * (100 / enem.MaxHP)) * ((spr.get_width() - 30) / 100)), 10))
-            pass
         # pg.draw.rect(win, (0, 100, 0), (680, 384, 50, 50))
         # get_width()
 pati = []
@@ -102,7 +116,7 @@ class enemy_class:
         if ch == 'Атака':
             host[0].HP -= self.specifications['Атака']
         else:
-            random.choice(self.magic).using(self, batlee.enemy_list, pati, host[0])
+            random.choice(self.magic).using(self, command, host, 0)
 def converting_text_to_enemy_class(ite):
     list_skill = []
     index_dictionary = ['Атака', 'Защита', 'Магия', 'Воля', 'Ловкость', 'Сноровка',
@@ -131,4 +145,4 @@ def life_check(ene):
     pass
 #copy.deepcopy()
 enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Земляной разлом v2'])
-enemy_combat_zone = [combat_zone((0,0,20,20), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]
+enemy_combat_zone = [combat_zone((0,0,20,20), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]
