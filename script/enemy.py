@@ -116,7 +116,8 @@ class enemy_class:
         if ch == 'Атака':
             host[0].HP -= self.specifications['Атака']
         else:
-            random.choice(self.magic).using(self, command, host, 0)
+            vbr = random.choice(self.magic)
+            vbr.using(self, command, host, 0)
 def converting_text_to_enemy_class(ite):
     list_skill = []
     index_dictionary = ['Атака', 'Защита', 'Магия', 'Воля', 'Ловкость', 'Сноровка',

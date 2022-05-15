@@ -7,14 +7,17 @@ from datetime import datetime
 cr_data = datetime.now().second
 fps = 0
 fps_pro = 0
-
+execution = False
 pg.font.init()
 pg.init()
+#prob_ = pg.Surface((1360, 768), flags=pg.SRCALPHA)
+surface = 1 # 1, 2, 3 тип поверхности, пол, середина, потолок
 
-
-win = pg.display.set_mode((1360, 768))
+win = pg.display.set_mode((1360, 768))#, flags=pg.SRCALPHA)
 pg.display.set_caption("Map editor 'Long Way'")
 f0 = pg.font.Font(sys.path[0] + "\\Fonts\\Gabriola One.ttf", 28)
+
+sl_2 = []
 
 class cam:
     def __init__(self, x, y):
@@ -45,28 +48,33 @@ class object:
         self.RGP = RGP
         self.sprait = spr
         self.py_sprai = py
+        self.surface = ['', '', '']
+        self.execution = False
+        self.dop_sprait = []
     def draw(self):
         ##  Чтобы отрисовка соответствовала позиции объекта его нужно отрисовывать
         ##  на self.rect[0]-camera.rect[0], self.rect[1]-camera.rect[1]
-        if self.sprait == []:
-            pg.draw.rect(win, self.RGP, (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], self.rect[2], self.rect[3]), 2)
+        if str(set(self.surface)) != "{''}":
+            if isinstance(self.surface[0], pg.Surface):
+                win.blit(self.surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
+            if isinstance(self.surface[1], pg.Surface):
+                #win.blit(self.surface[surface], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1]))
+                if self.execution != execution:
+                    self.execution = True if execution == False else False
+                else:
+                    sl_2.append([self.surface[1], self.rect])
+                #prob_.blit(self.surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
         else:
-            for i in self.sprait:
-                win.blit(i, (self.rect[0], self.rect[1]))
-    def vns(self):
-        objects.append(sam_object(self.rect[0], self.rect[1], self.rect[2], self.rect[3]))
+            pg.draw.rect(win , self.RGP, (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], self.rect[2], self.rect[3]), 2)
+        for i in self.dop_sprait:
+            if i.execution == execution:
+                i.execution = True if execution == False else False
+            else:
+                sl_2.append([i.surface[1], i.rect])
     def dop(self, v):
-        self.sprait = [*self.sprait, v[0]]
-        self.py_sprai = [*self.py_sprai, v[1]]
-class sam_object:
-    def __init__(self, x, y, width, height):
-        self.rect = pg.Rect(x, y, width, height)
-    def draw(self):
-        pg.draw.rect(win, (255, 0, 0), (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], self.rect[2], self.rect[3]))
-    def vns(self):
-        print('f')
+        self.surface[surface - 1] = v[0]
 #objects = [object(250, 250, 30, 30)]
-fail = [[pg.image.load(sys.path[0] + f"\\aset\\{i}").convert(), f"\\aset\\{i}"] for i in os.listdir('\prog\Long Way\\aset') if '.png' in i]
+fail = [[pg.image.load(sys.path[0] + f"\\aset\\{i}").convert_alpha(), f"\\aset\\{i}"] for i in os.listdir('\prog\Long Way\\aset') if '.png' in i]
 tra = pg.image.load(sys.path[0] + f"\\aset\\tra.png").convert()
 class archive_image:
     def __init__(self, image_arh):
@@ -103,8 +111,8 @@ player = Player(0, 0)
 camera = cam(0, 0)
 clock = pg.time.Clock()
 objects = []
-x_ = 1000 #int(input('Ширина карты '))
-y_ = 1000 #int(input('Высота карты '))
+x_ = 100 #int(input('Ширина карты '))
+y_ = 100 #int(input('Высота карты '))
 tra = pg.image.load(sys.path[0] + "\\aset\\tra.png").convert()
 l = pg.image.load(sys.path[0] + "\\aset\\icon.png").convert()
 class big_chunk:
@@ -144,6 +152,7 @@ def otr():
 def recursion_otr(spis, ind):
     if isinstance(spis[0], object):
         [(obj.draw(), faj.append(obj)) for obj in spis if obj.rect.colliderect(camera.rect)]
+        #[([obj.draw(surface=i) for i in range(3)], faj.append(obj)) for obj in [obj for obj in spis if obj.rect.colliderect(camera.rect)]]
         return
     elif spis[ind].rect.colliderect(camera.rect):
         recursion_otr(spis[ind].compound, 0)
@@ -158,6 +167,7 @@ if False:
             objects.append(object(x * 50, y * 50, 50, 50))
             #objects.append(object(x * -50, y * -50, 50, 50))
 vs_pr = [tra, "\\aset\\tra.png"]
+
 vaj = []
 pok = False
 speed = 5
@@ -173,7 +183,7 @@ while True:
             sys.exit()
         if event.type==pg.KEYDOWN:
             if event.key == pg.K_z:
-                print(f"{camera.rect[0]}, {camera.rect[1]}, мышки: {x}, {y}")
+                print(sl_2)
             if event.key == pg.K_ESCAPE:
                 if pok == True:
                     pok = False
@@ -184,15 +194,34 @@ while True:
                 for i in objects:
                     if len(i.sprait) > 0:    
                         print(f'{("_").join(i.py_sprai)} {i.rect[0]}_{i.rect[1]}_{i.rect[2]}_{i.rect[3]}')            
+     
+                
+                data = [[], ]
+                for i in prop_objects:
+                    data_str = [[i.rect[0], i.rect[1], i.rect[2],  i.rect[3]], ]
+                    for d in i.compound:
+                        data_str.append([d.rect[0], d.rect[1], d.rect[2], d.rect[3]])
+                        for v in d.compound:
+                            data_str.append([v.rect[0], v.rect[1], v.rect[2], v.rect[3]])
+                            peremen_0 = [[[obj.rect[0], obj.rect[1], obj.rect[2], obj.rect[3], ('_').join(obj.py_sprai)], data[0].extend(obj.py_sprai)] for obj in v.compound if len(obj.py_sprai) > 0] # 
+                            for peremen_1 in peremen_0:
+                                data_str.append(peremen_1[0])
+                    print(data_str)
+                    data.append(('_').join([(', ').join([str(d) for d in i]) for i in data_str]))
+                data[0] = list(set(data[0]))
+                name_map = input('Название карты ') + '.txt'
+                with open(name_map, 'w', encoding='utf-8') as file:
+                    file.writelines((' ').join([('_').join(data[0]), str(len(data) - 1)]) + '\n')
+                    for s in data[1:]:
+                        file.writelines(str(s) + '\n')
                 pg.quit()
                 sys.exit()
-                name_map = 'game\\' + input('Название карты ')+'.txt'
-                with open(name_map, 'w', encoding='utf-8') as file:
-                    for i in objects:
-                        if len(i.sprait) > 0:
-                            s = f'{("_").join(i.py_sprai)} {i.rect[0]}_{i.rect[1]}_{i.rect[2]}_{i.rect[3]}\n'
-                            file.writelines(s)
-
+            if event.key == pg.K_1:
+                surface = 1
+            elif event.key == pg.K_2:
+                surface = 2
+            elif event.key == pg.K_3:
+                surface = 3
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:  #  левая кнопка мыши
                 doMove = True
@@ -202,14 +231,13 @@ while True:
             x -= l.get_width()/2
             y -= l.get_height()/2
             if pok == False:
-                print(len(faj))
+
                 for obj in faj:
                     if isinstance(obj, object):
-                        if obj.rect.colliderect(pg.Rect(x + 25, y + 25, 1, 1)):
-                        #if obj.rect.colliderect(pg.Rect((x + 25) + camera.rect[0], (y + 25) + camera.rect[1], 1, 1)):
+                        odj_r = pg.Rect(obj.rect[0] - camera.rect[0], obj.rect[1] - camera.rect[1], obj.rect[2], obj.rect[3])
+                        if odj_r.colliderect(pg.Rect(x + 25,  y + 25, 1, 1)):
                             if event.button == 1:
-                                if vs_pr not in obj.sprait:
-                                    obj.dop(vs_pr)
+                                obj.dop(vs_pr)
                             else:
                                 if len(obj.sprait) > 0:
                                     obj.sprait.pop()
@@ -222,7 +250,6 @@ while True:
     kpressed = pg.key.get_pressed()
     vector = [0, 0]
 # считывем движения
-
     if kpressed[pg.K_UP]:
         vector[1] -= speed
     elif kpressed[pg.K_DOWN]:
@@ -235,8 +262,10 @@ while True:
     if vector != [0, 0]:
         player.move(vector)
         camera.move(vector)
+    sl_2 = []
 # делаем фон карты белым
     win.fill((255, 255, 255))
+    #sur_0.fill((255, 255, 255))
     if False:
         for obj in objects:
             if obj.rect.colliderect(camera.rect):
@@ -244,9 +273,14 @@ while True:
     faj = []
     #faj = otr()
     [recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)]
+    [win.blit(i[0], (i[1][0] - camera.rect[0], i[1][1] - camera.rect[1])) for i in sl_2] #(i[0].get_width() - i[1][0] - camera.rect[0], i[0].get_height() - i[1][1] - camera.rect[1])
+    #x -= l.get_width()/2 i[0].get_width() - 
+    #y -= l.get_height()/2 i[0].get_height() - 
+    #[obj.draw(surface=2) for obj in faj]
     #[obj.draw() for obj in objects if obj.rect.colliderect(camera.rect)]
     #map(.draw, filter(lambda obj: obj.rect.colliderect(camera.rect), objects))
     player.draw()
+    #win.blit(prob_, (0 , 0))
     fps += 1
     if fps == 300:
         fps = 299
@@ -260,8 +294,11 @@ while True:
         elif fps_pro > min_max[1]:
             min_max[1] = fps_pro
         fps = 0
+    execution = True if execution == False else False
     #win.blit(pg.transform.scale(fail[2], (50, 50)), (500, 500))
-    pg.draw.rect(win, (0, 0, 0), (x + 25 - player.rect[0] + camera.rect[0], y + 25 + player.rect[1] - camera.rect[1], 5, 5), 5)
+    pg.draw.rect(win, (0, 0, 0), (x + 25,  y + 25, 5, 5) , 5)
+    win.blit(f0.render(str(surface), True, (47, 79, 79)), (1332, 740))
+    #pg.draw.rect(win, (0, 0, 0), (x + 25 - player.rect[0] + camera.rect[0], y + 25 + player.rect[1] - camera.rect[1], 5, 5), 5)
     if pok == True:
         fail.render()
     #win.blit(fail[4], (0, 0))

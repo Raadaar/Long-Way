@@ -3,7 +3,7 @@ import sys
 from random import randint
 # sys.path[0]
 import pygame as pg
-
+path = script.guide.path
 pg.font.init()
 pg.init()
 win = pg.display.set_mode((1360, 768))

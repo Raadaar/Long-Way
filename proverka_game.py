@@ -1,6 +1,7 @@
 
 from script.start_game import win, pg, sys, randint, f1
 import script.guide
+from script.map import prop_objects, recursion_otr
 # Название игры
 pg.display.set_caption('Long Way')
 from script.base_classes import player, object, camera
@@ -49,6 +50,8 @@ v_m_p = [350, 93]
 vpr_pr = 0
 #
 frame_coo = [0, 484]
+# Доп блоки
+# Не пересекаемый 
 
 clock = pg.time.Clock()
 #
@@ -122,7 +125,43 @@ while  1:
         kpressed = pg.key.get_pressed()
 
     # считывем движения
-
+        #if kpressed[pg.K_UP]:
+        #    for border in spic:
+        #        # 680 и 384 это центр камеры, там стоит игрок и так как обьекты отображаются относительно камеры, эти кординаты надо отнимать для правильной колизии игрока и этих обьектов
+        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
+        #        # Вот тут я сам хз почему нулевые кординаты, но 1 нужен для проверки колизии)
+        #        testRect = pg.Rect(Player(0, -speed))  
+        #        if testRect.colliderect(border):
+        #            # Если найден обьект мешающий пройти, кордината онуляется 
+        #            vector[1] += speed
+        #            break
+        #    vector[1] -= speed
+        #elif kpressed[pg.K_DOWN]:
+        #    for border in spic:
+        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
+        #        testRect = pg.Rect(Player(0, speed))  
+        #        if testRect.colliderect(border):
+        #            vector[1] -= speed
+        #            break
+        #    vector[1] += speed
+#
+        #if kpressed[pg.K_LEFT]:
+        #    for border in spic:
+        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
+        #        testRect = pg.Rect(Player(-speed, 0))  
+        #        if testRect.colliderect(border):
+        #            vector[0] += speed
+        #            break
+        #    vector[0] -= speed
+#
+        #elif kpressed[pg.K_RIGHT]:
+        #    for border in spic:
+        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
+        #        testRect = pg.Rect(Player(speed, 0))  
+        #        if testRect.colliderect(border):
+        #            vector[0] -= speed
+        #            break
+        #    vector[0] += speed
         if kpressed[pg.K_UP]:
 
             vector[1] -= speed
@@ -142,9 +181,7 @@ while  1:
             border_test = pg.Rect(border.re[0] - 680, border.re[1] - 384, border.re[2], border.re[3])
             testRect = pg.Rect(player.rect[0], player.rect[1], 40, 40)
             if testRect.colliderect(border_test):
-                print(border)
-                border.beginning_battle(batlee)
-                akt_fn = battle_men.fkl()
+                per_re_batl[0] = True
 
 
         ##  Если игрок ходил
@@ -153,7 +190,8 @@ while  1:
             camera.move(vector)
             if per_re_batl[0] == True:
                 if randint(0, 1000) > 990:
-                    per_re_batl[1] = True
+                    border.beginning_battle(batlee)
+                    akt_fn = battle_men.fkl()
 # делаем фон карты белым
     win.fill((255, 255, 255))
 # показывем игрока
@@ -174,6 +212,7 @@ while  1:
 #        text_surface, rect = GAME_FONT.render("Hello World!", (0, 0, 0))
 #        win.blit(text_surface, (40, 250))
 # другие обькты
+    [recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)]
     for obj in objects:
         ##  Если объект на экране, отрисовать его
         if obj.rect.colliderect(camera.rect):

@@ -98,7 +98,7 @@ class spreadsheet:
     def output(self):
         self.dop_ot(self, fps)
         if self.inactive_display != '':
-            self.inactive_display[0](self.inactive_display[1])
+            self.inactive_display[0](self.inactive_display[1], self)
         win.blit(self.sprait, (0, 0))
         if len(self.dop_spait[0]) > 1:
             for pak in self.dop_spait:
@@ -303,7 +303,12 @@ class meni:
                         batlee.bat(pati)
             elif self.ataw == 5:
                 if random.randint(1, 101) > 50:
-                    pass
+                    battle_men.aktv = False
+                    self.pyt = []
+                    self.ataw = 1
+                    ost_pyt[self.ataw][0].additional_key = False
+                    ost_pyt[self.ataw][0].p = 0
+                    ost_pyt[self.ataw][0].ak = False
                 else:
                     batlee.bat(pati)
             else:
@@ -328,10 +333,10 @@ battle_men = meni(
         spreadsheet(s=men_batlle, s_r=men_batlle_v, dop_sprai=[[men_batlle_ram, (0, 644)],], additional_tap=script.enemy.batlee.peredv, dop_ot=script.enemy.batlee.maping, n_r=(160, 564), p_r=(300, 20), g_r=(1360, 768), prin_tab=display_abilities.rendering_interface, tab=((pleeer.adility, ), False), inactive_display=[maping, pati]),
     ),
     (
-        spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), dop_sprai=[[men_batlle, (0,0)], [men_batlle_ram, (0,684)]], dop_ot=script.enemy.batlee.maping, s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 0), prin_tab=iventar.otrisovka),
+        spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), dop_sprai=[[men_batlle, (0,0)], [men_batlle_ram, (0,684)]], dop_ot=script.enemy.batlee.maping, s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 0), prin_tab=iventar.otrisovka, inactive_display=[maping, pati]),
     ),
     (
-        spreadsheet(s=men_batlle, dop_sprai=[[men_batlle_ram, (0, 724)]]),
+        spreadsheet(s=men_batlle, dop_sprai=[[men_batlle_ram, (0, 724)]], ak=True, inactive_display=[maping, pati]),
     ),
     )
     )
