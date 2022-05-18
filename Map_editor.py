@@ -11,13 +11,15 @@ execution = False
 pg.font.init()
 pg.init()
 #prob_ = pg.Surface((1360, 768), flags=pg.SRCALPHA)
-surface = 1 # 1, 2, 3 тип поверхности, пол, середина, потолок
+surface = 2 # 1, 2, 3 тип поверхности, пол, середина, потолок
 
 win = pg.display.set_mode((1360, 768))#, flags=pg.SRCALPHA)
 pg.display.set_caption("Map editor 'Long Way'")
 f0 = pg.font.Font(sys.path[0] + "\\Fonts\\Gabriola One.ttf", 28)
 
 sl_2 = []
+dre = pg.image.load(sys.path[0] + f"\\aset\\prob_derev.png").convert_alpha()
+tra = pg.image.load(sys.path[0] + f"\\aset\\tra.png").convert()
 
 class cam:
     def __init__(self, x, y):
@@ -43,13 +45,13 @@ class Player:
 
 class object:
     ##  Это какой-нибудь объект, отличный игрока (к примеру враг или дерево)
-    def __init__(self, x, y, width, height, RGP=(255, 0, 0), spr=[], py=[]):
+    def __init__(self, x, y, width, height, RGP=(255, 0, 0), srf=['', '', ''], spr=[], py=[]):
         self.rect = pg.Rect(x, y, width, height)
         self.RGP = RGP
         self.sprait = spr
         self.py_sprai = py
-        self.surface = ['', '', '']
-        self.execution = False
+        self.surface = srf
+        self.execution = 0
         self.dop_sprait = []
     def draw(self):
         ##  Чтобы отрисовка соответствовала позиции объекта его нужно отрисовывать
@@ -59,23 +61,22 @@ class object:
                 win.blit(self.surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
             if isinstance(self.surface[1], pg.Surface):
                 #win.blit(self.surface[surface], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1]))
-                if self.execution != execution:
-                    self.execution = True if execution == False else False
-                else:
+                if self.execution != fps:
                     sl_2.append([self.surface[1], self.rect])
+                    self.execution = fps
                 #prob_.blit(self.surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
+                pass
         else:
             pg.draw.rect(win , self.RGP, (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], self.rect[2], self.rect[3]), 2)
         for i in self.dop_sprait:
-            if i.execution == execution:
-                i.execution = True if execution == False else False
-            else:
+            if i.execution != fps:
                 sl_2.append([i.surface[1], i.rect])
+                i.execution = fps       
     def dop(self, v):
         self.surface[surface - 1] = v[0]
 #objects = [object(250, 250, 30, 30)]
 fail = [[pg.image.load(sys.path[0] + f"\\aset\\{i}").convert_alpha(), f"\\aset\\{i}"] for i in os.listdir('\prog\Long Way\\aset') if '.png' in i]
-tra = pg.image.load(sys.path[0] + f"\\aset\\tra.png").convert()
+
 class archive_image:
     def __init__(self, image_arh):
         self.image_arh = image_arh
@@ -129,7 +130,7 @@ class small_chunk:
         self.compound = []
         for x_para in range(25):
             for y_para in range(25):
-                self.compound.append(object(x + x_para * 50, y + y_para * 50, 50, 50)) #, spr=(tra, )
+                self.compound.append(object(x + x_para * 50, y + y_para * 50, 50, 50, srf=[tra, '', ''])) #, spr=(tra, )
         self.compound = tuple(self.compound)   
 prop_objects = []
 for x in range(x_ // 100):
@@ -149,6 +150,7 @@ def otr():
                                     x.append(ob)
                                     ob.draw()
     return x
+# .dop_sprait
 def recursion_otr(spis, ind):
     if isinstance(spis[0], object):
         [(obj.draw(), faj.append(obj)) for obj in spis if obj.rect.colliderect(camera.rect)]
@@ -160,14 +162,33 @@ def recursion_otr(spis, ind):
     if ind == len(spis):
         return
     return recursion_otr(spis, ind)
+def recursion_otr_(spis, ind, spra):
+    if isinstance(spis[1], object):
+        [obj.dop_sprait.append(spra[0]) for obj in spis if obj.rect.colliderect(spra[1])]
+        #[([obj.draw(surface=i) for i in range(3)], faj.append(obj)) for obj in [obj for obj in spis if obj.rect.colliderect(camera.rect)]]
+        return
+    elif spis[ind].rect.colliderect(spra[1]):
+        recursion_otr_(spis[ind].compound, 0, spra)
+    ind += 1
+    if ind == len(spis):
+        return
+    return recursion_otr_(spis, ind, spra)
 #[ob.draw() for ob in [v for v in [d for d in [i for i in prop_objects if i.rect.colliderect(camera.rect)][0].compound if d.rect.colliderect(camera.rect)][0].compound if v.rect.colliderect(camera.rect)] if ob.rect.colliderect(camera.rect)]
 if False:
     for x in range(x_):
         for y in range(y_):
             objects.append(object(x * 50, y * 50, 50, 50))
             #objects.append(object(x * -50, y * -50, 50, 50))
-vs_pr = [tra, "\\aset\\tra.png"]
-
+vs_pr = [dre, "\\aset\\tra.png"]
+#
+for i in prop_objects:
+    for d in i.compound:
+        for v in d.compound:
+            for obj in v.compound:
+                obj.dop(vs_pr)
+                gf = pg.Rect(obj.rect[0], obj.rect[1], vs_pr[0].get_width(), vs_pr[0].get_height())
+                [recursion_otr_(i.compound, 0, (obj, gf)) for i in prop_objects if i.rect.colliderect(gf)]
+#
 vaj = []
 pok = False
 speed = 5
@@ -237,7 +258,12 @@ while True:
                         odj_r = pg.Rect(obj.rect[0] - camera.rect[0], obj.rect[1] - camera.rect[1], obj.rect[2], obj.rect[3])
                         if odj_r.colliderect(pg.Rect(x + 25,  y + 25, 1, 1)):
                             if event.button == 1:
-                                obj.dop(vs_pr)
+                                if surface == 1:
+                                    obj.dop(vs_pr)
+                                else:
+                                    obj.dop(vs_pr)
+                                    gf = pg.Rect(obj.rect[0], obj.rect[1], vs_pr[0].get_width(), vs_pr[0].get_height())
+                                    [recursion_otr_(i.compound, 0, (obj, gf)) for i in prop_objects if i.rect.colliderect(gf)]
                             else:
                                 if len(obj.sprait) > 0:
                                     obj.sprait.pop()
@@ -273,7 +299,7 @@ while True:
     faj = []
     #faj = otr()
     [recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)]
-    [win.blit(i[0], (i[1][0] - camera.rect[0], i[1][1] - camera.rect[1])) for i in sl_2] #(i[0].get_width() - i[1][0] - camera.rect[0], i[0].get_height() - i[1][1] - camera.rect[1])
+    [win.blit(i[0], (i[1][0] - camera.rect[0], i[1][1] - camera.rect[1])) for i in sorted(sl_2, key=lambda x: [x[1][0], x[1][1]])] #(i[0].get_width() - i[1][0] - camera.rect[0], i[0].get_height() - i[1][1] - camera.rect[1])
     #x -= l.get_width()/2 i[0].get_width() - 
     #y -= l.get_height()/2 i[0].get_height() - 
     #[obj.draw(surface=2) for obj in faj]
@@ -294,7 +320,6 @@ while True:
         elif fps_pro > min_max[1]:
             min_max[1] = fps_pro
         fps = 0
-    execution = True if execution == False else False
     #win.blit(pg.transform.scale(fail[2], (50, 50)), (500, 500))
     pg.draw.rect(win, (0, 0, 0), (x + 25,  y + 25, 5, 5) , 5)
     win.blit(f0.render(str(surface), True, (47, 79, 79)), (1332, 740))
