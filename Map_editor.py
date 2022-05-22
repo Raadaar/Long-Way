@@ -11,15 +11,13 @@ execution = False
 pg.font.init()
 pg.init()
 #prob_ = pg.Surface((1360, 768), flags=pg.SRCALPHA)
-surface = 2 # 1, 2, 3 тип поверхности, пол, середина, потолок
+surface = 1 # 1, 2, 3 тип поверхности, пол, середина, потолок
 
 win = pg.display.set_mode((1360, 768))#, flags=pg.SRCALPHA)
 pg.display.set_caption("Map editor 'Long Way'")
 f0 = pg.font.Font(sys.path[0] + "\\Fonts\\Gabriola One.ttf", 28)
 
 sl_2 = []
-dre = pg.image.load(sys.path[0] + f"\\aset\\prob_derev.png").convert_alpha()
-tra = pg.image.load(sys.path[0] + f"\\aset\\tra.png").convert()
 
 class cam:
     def __init__(self, x, y):
@@ -45,38 +43,42 @@ class Player:
 
 class object:
     ##  Это какой-нибудь объект, отличный игрока (к примеру враг или дерево)
-    def __init__(self, x, y, width, height, RGP=(255, 0, 0), srf=['', '', ''], spr=[], py=[]):
+    def __init__(self, x, y, width, height, RGP=(255, 0, 0), gg=['', '', ''], spr=[], py=[]):
         self.rect = pg.Rect(x, y, width, height)
         self.RGP = RGP
         self.sprait = spr
         self.py_sprai = py
-        self.surface = srf
+        self.barrier = True
+        self.chest = []
+        self.nps = []
+        # Очень страннный баг, если _surface давать gg, то при обращение к _surface оно меняет _surface всех классов object
+        self._surface = ['', '', '']
         self.execution = 0
         self.dop_sprait = []
     def draw(self):
         ##  Чтобы отрисовка соответствовала позиции объекта его нужно отрисовывать
         ##  на self.rect[0]-camera.rect[0], self.rect[1]-camera.rect[1]
-        if str(set(self.surface)) != "{''}":
-            if isinstance(self.surface[0], pg.Surface):
-                win.blit(self.surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
-            if isinstance(self.surface[1], pg.Surface):
-                #win.blit(self.surface[surface], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1]))
+        if str(set(self._surface)) != "{''}":
+            if isinstance(self._surface[0], pg.Surface):
+                win.blit(self._surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
+            if isinstance(self._surface[1], pg.Surface):
+                #win.blit(self._surface[surface], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1]))
                 if self.execution != fps:
-                    sl_2.append([self.surface[1], self.rect])
+                    sl_2.append([self._surface[1], self.rect])
                     self.execution = fps
-                #prob_.blit(self.surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
-                pass
+                #prob_.blit(self._surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
+
         else:
             pg.draw.rect(win , self.RGP, (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], self.rect[2], self.rect[3]), 2)
         for i in self.dop_sprait:
             if i.execution != fps:
-                sl_2.append([i.surface[1], i.rect])
+                sl_2.append([i._surface[1], i.rect])
                 i.execution = fps       
     def dop(self, v):
-        self.surface[surface - 1] = v[0]
+        self._surface[surface - 1] = v[0]
 #objects = [object(250, 250, 30, 30)]
 fail = [[pg.image.load(sys.path[0] + f"\\aset\\{i}").convert_alpha(), f"\\aset\\{i}"] for i in os.listdir('\prog\Long Way\\aset') if '.png' in i]
-
+tra = pg.image.load(sys.path[0] + f"\\aset\\tra.png").convert()
 class archive_image:
     def __init__(self, image_arh):
         self.image_arh = image_arh
@@ -130,7 +132,7 @@ class small_chunk:
         self.compound = []
         for x_para in range(25):
             for y_para in range(25):
-                self.compound.append(object(x + x_para * 50, y + y_para * 50, 50, 50, srf=[tra, '', ''])) #, spr=(tra, )
+                self.compound.append(object(x + x_para * 50, y + y_para * 50, 50, 50)) #, spr=(tra, )
         self.compound = tuple(self.compound)   
 prop_objects = []
 for x in range(x_ // 100):
@@ -150,7 +152,6 @@ def otr():
                                     x.append(ob)
                                     ob.draw()
     return x
-# .dop_sprait
 def recursion_otr(spis, ind):
     if isinstance(spis[0], object):
         [(obj.draw(), faj.append(obj)) for obj in spis if obj.rect.colliderect(camera.rect)]
@@ -179,16 +180,8 @@ if False:
         for y in range(y_):
             objects.append(object(x * 50, y * 50, 50, 50))
             #objects.append(object(x * -50, y * -50, 50, 50))
-vs_pr = [dre, "\\aset\\tra.png"]
-#
-for i in prop_objects:
-    for d in i.compound:
-        for v in d.compound:
-            for obj in v.compound:
-                obj.dop(vs_pr)
-                gf = pg.Rect(obj.rect[0], obj.rect[1], vs_pr[0].get_width(), vs_pr[0].get_height())
-                [recursion_otr_(i.compound, 0, (obj, gf)) for i in prop_objects if i.rect.colliderect(gf)]
-#
+vs_pr = [tra, "\\aset\\tra.png"]
+
 vaj = []
 pok = False
 speed = 5
@@ -252,7 +245,6 @@ while True:
             x -= l.get_width()/2
             y -= l.get_height()/2
             if pok == False:
-
                 for obj in faj:
                     if isinstance(obj, object):
                         odj_r = pg.Rect(obj.rect[0] - camera.rect[0], obj.rect[1] - camera.rect[1], obj.rect[2], obj.rect[3])
@@ -260,6 +252,7 @@ while True:
                             if event.button == 1:
                                 if surface == 1:
                                     obj.dop(vs_pr)
+                                    break
                                 else:
                                     obj.dop(vs_pr)
                                     gf = pg.Rect(obj.rect[0], obj.rect[1], vs_pr[0].get_width(), vs_pr[0].get_height())
@@ -272,10 +265,12 @@ while True:
                     if obj.rect.colliderect(pg.Rect((x + 25), (y + 25), 1, 1)):
                         vs_pr[0] = obj.sprait[-1]
                         vs_pr[1] = obj.py_sprai[-1]
+            
             #objects.append(object((x + 25) + camera.rect[0], (y + 25) + camera.rect[1], 5, 5, RGP=(0, 0, 255)))
     kpressed = pg.key.get_pressed()
     vector = [0, 0]
 # считывем движения
+
     if kpressed[pg.K_UP]:
         vector[1] -= speed
     elif kpressed[pg.K_DOWN]:
