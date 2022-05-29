@@ -8,10 +8,6 @@ from script.base_classes import player, object, camera
 # делаем слепки обьектов, наверное) 
 #player = Player(0, 0)
 #camera = cam(0, 0)
-# "D:/prog/game/aset/derevo.png"
-with open(r'D:\\prog\\f.txt', 'r', encoding='utf-8') as file:
-    objects = [object(int(i[1][0]), int(i[1][1]), int(i[1][2]), int(i[1][3]), spr=[pg.image.load(script.guide.path + i[0][0]).convert_alpha(), ]) for i in (list(map(lambda x: [i.split('_') for i in x.split()], list(map(str.strip, file.readlines())))))]
-# Загрузка спрайтов
 men_iven =  [pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive.png").convert_alpha()]
 ramka = pg.image.load(script.guide.path + "\\aset\\men\\ramka.png").convert_alpha()
 
@@ -197,10 +193,10 @@ while  1:
 # показывем игрока
     # показывают пол
     #floor(Map, camera.rect[0], camera.rect[1], frame)
-    win.blit(animation_set[frame // 12], (100 - camera.rect[0], 20 - camera.rect[1]))
+    #win.blit(animation_set[frame // 12], (100 - camera.rect[0], 20 - camera.rect[1]))
     frame += 1
     # скорость анимации
-    if frame == 60:
+    if frame == 300:
         frame = 0
     # показывает кавадрат на фоне персоонажа, этот же квадрат, показывает границу колизии
     #player.draw()
@@ -212,11 +208,10 @@ while  1:
 #        text_surface, rect = GAME_FONT.render("Hello World!", (0, 0, 0))
 #        win.blit(text_surface, (40, 250))
 # другие обькты
-    [recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)]
-    for obj in objects:
-        ##  Если объект на экране, отрисовать его
-        if obj.rect.colliderect(camera.rect):
-            obj.draw()
+    prop_objects = sorted(prop_objects, key=lambda x: [x.rect[0], x.rect[1]])
+    #[recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)] sorted(puzzles[xislo], key=lambda x: [x[0][0], x[0][1]])
+    [win.blit(i._surface[0], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
+    [win.blit(i._surface[1], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
     win.blit(pleer, (680, 384))
     #win.blit(dereo, (1400 - camera.rect[0], 768 - camera.rect[1]))
     #win.blit(pla, (vector[0], 512 - vector[1]))
@@ -231,6 +226,6 @@ while  1:
     fps.output()
     #win.blit(dre, (50 - camera.rect[0], 600 - camera.rect[1]))
     pg.display.flip() ##    = pg.display.update()
-    clock.tick(60)
+    clock.tick(300)
     pg.time.wait(1)
 # 0.17
