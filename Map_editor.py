@@ -126,7 +126,7 @@ camera = cam(0, 0)
 clock = pg.time.Clock()
 objects = []
 x_ = 200 #int(input('Ширина карты '))
-y_ = 500 #int(input('Высота карты '))
+y_ = 200 #int(input('Высота карты '))
 dre = pg.image.load(sys.path[0] + f"\\aset\\prob_derev.png").convert_alpha()
 tra = pg.image.load(sys.path[0] + "\\aset\\tra.png").convert()
 l = pg.image.load(sys.path[0] + "\\aset\\icon.png").convert()
@@ -145,8 +145,8 @@ class small_chunk:
         for x_para in range(25):
             for y_para in range(25):
                 s = object(x + x_para * 50, y + y_para * 50, 50, 50)
-                #s._surface[0] = tra
-                #s._surface_py[0] = "\\aset\\tra.png"
+                s._surface[0] = tra
+                s._surface_py[0] = "\\aset\\tra.png"
                 #s._surface[1] = dre
                 #s._surface_py[1] = "\\aset\\prob_derev.png"
                 self.compound.append(s) #, spr=(tra, )
@@ -239,7 +239,7 @@ while True:
                         data_str.append([d.rect[0], d.rect[1], d.rect[2], d.rect[3]])
                         for v in d.compound:
                             data_str.append([v.rect[0], v.rect[1], v.rect[2], v.rect[3]])
-                            peremen_0 = [[[obj.rect[0], obj.rect[1], obj.rect[2], obj.rect[3], ('!').join([i for i in obj._surface_py if i != '']), obj.barrier, obj.chest, obj.nps], data[0].extend(obj._surface_py)] for obj in v.compound if len(set(obj._surface_py)) > 1] # 
+                            peremen_0 = [[[obj.rect[0], obj.rect[1], obj.rect[2], obj.rect[3], ('!').join([i for i in obj._surface_py if i != '']), obj.barrier, ('!').join([f"{i[0]}${i[1]}" for i in obj.chest]), obj.nps], data[0].extend(obj._surface_py)] for obj in v.compound if len(set(obj._surface_py)) > 1] # 
                             for peremen_1 in peremen_0:
                                 data_str.append(peremen_1[0])
                     data.append(('~').join([(', ').join([str(d) for d in i]) for i in data_str]))

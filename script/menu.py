@@ -2,6 +2,7 @@ from datetime import datetime
 from script.start_game import win, pg
 import script.guide
 # script.guide.path
+from script.radota_text import Text, pla, text
 from script.inven import *
 from script.player_modile import pleeer
 from script.modile_interface import showing_properties, gr, display_abilities
@@ -96,10 +97,11 @@ class spreadsheet:
                 self.p += slow[kyda]
             print(self.p)
     def output(self):
-        self.dop_ot(self, fps)
+        #self.dop_ot(self, fps) 04.06 дата изменения
         if self.inactive_display != '':
             self.inactive_display[0](self.inactive_display[1], self)
         win.blit(self.sprait, (0, 0))
+        self.dop_ot(self, fps) # 04.06 дата изменения
         if len(self.dop_spait[0]) > 1:
             for pak in self.dop_spait:
                 win.blit(pak[0], pak[1])
@@ -313,6 +315,16 @@ class meni:
                     batlee.bat(pati)
             else:
                 ost_pyt[self.ataw][0].ak = True
+        elif dialog_men.aktv == True:
+            if text.xod == False:
+                text.blok += 1
+                if text.blok >= len(text.ob_text):
+                    dialog_men.aktv = False
+                text.stroka = 0
+                text.xod = True
+            elif text.xod == True:
+                text.stroka = len(text.ob_text[text.blok]) -1 
+                text.xod == False
         else:
             ost_pyt[self.ataw][0].ak = True
 inven = meni(x)
@@ -321,7 +333,7 @@ men_batlle_v = pg.image.load(script.guide.path + "\\aset\\men\\ramka_p_sc.png").
 men_batlle = pg.image.load(script.guide.path + "\\aset\\men\\oc_m_b.png").convert_alpha()
 battle_men = meni(
     (
-    (('Низ', 'Верх'), 5),
+        (('Низ', 'Верх'), 5),
     (
         spreadsheet(s=men_batlle, dop_sprai=[[men_batlle_ram, (0, 564)],], additional_tap=script.enemy.batlee.peredv, dop_ot=script.enemy.batlee.maping, ak=True, inactive_display=[maping, pati]),
         #spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 2), prin_tab=iventar.otrisovka)
@@ -340,4 +352,12 @@ battle_men = meni(
     ),
     )
     )
-men_list = [inven, battle_men]
+dialog_men = meni(
+    (
+        (('Низ', 'Верх'), 1),
+    (
+        spreadsheet(s=pla, ak=True, dop_ot=text.otr),
+    ),
+    )
+    )
+men_list = [inven, battle_men, dialog_men]

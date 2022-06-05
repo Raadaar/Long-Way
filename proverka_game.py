@@ -1,7 +1,6 @@
-
 from script.start_game import win, pg, sys, randint, f1
 import script.guide
-from script.map import prop_objects, recursion_otr
+from script.map import prop_objects, recursion_otr, card
 # Название игры
 pg.display.set_caption('Long Way')
 from script.base_classes import player, object, camera
@@ -30,7 +29,7 @@ from script.enemy import *
 for i in thing.list_of_items.values():
     iventar.dopov([i, 1])
 ######################################################
-from script.menu import inven, battle_men, men_list, fps   
+from script.menu import inven, battle_men, men_list, fps, dialog_men, text
 ######################################################
 #beginning_battle
 speed = 5
@@ -76,7 +75,8 @@ battle_men_son = [pg.Rect(0, 0, 300, 300)]
 
 frame = 0
 attack_delay = 0
-
+bj = False
+bj_ = False
 ibi = ['Голова', 'Туловище', 'Ноги', 'Оружие', 'Щит', 'Кольцо_0', 'Кольцо_1', 'Кольцо_2']
 while  1:
     for event in pg.event.get():
@@ -108,9 +108,14 @@ while  1:
                     if i.aktv == True:
                         i.peredwe('Низ')
             if event.key == 13: 
+                if sum(i.aktv for i in men_list) == 0:
+                    bj_ = True    
+                    bj = player.test_area()
+                    #[print(i[2]) for i in card.interaction_layer if bj.colliderect(i[0])]    
                 for i in men_list:
                     if i.aktv == True:
                         i.akt()
+   
             if event.key == pg.K_z:
                 print([i.HP for i in batlee.enemy_list])  
                 print(pleeer.HP, batlee.enemy_list[0].condition)
@@ -159,18 +164,19 @@ while  1:
         #            break
         #    vector[0] += speed
         if kpressed[pg.K_UP]:
-
+            player.route = 'up'
             vector[1] -= speed
-        elif kpressed[pg.K_DOWN]:
 
+        elif kpressed[pg.K_DOWN]:
+            player.route = 'down'
             vector[1] += speed
 
         if kpressed[pg.K_LEFT]:
-
+            player.route = 'left'
             vector[0] -= speed
 
         elif kpressed[pg.K_RIGHT]:
-
+            player.route = 'right'
             vector[0] += speed
         # Вр зоны
         for border in enemy_combat_zone:
@@ -182,7 +188,7 @@ while  1:
 
         ##  Если игрок ходил
         if vector != [0, 0]:
-            player.move(vector)
+            player.move(vector, fps.fps)
             camera.move(vector)
             if per_re_batl[0] == True:
                 if randint(0, 1000) > 990:
@@ -200,7 +206,7 @@ while  1:
         frame = 0
     # показывает кавадрат на фоне персоонажа, этот же квадрат, показывает границу колизии
     #player.draw()
-    pg.draw.rect(win, (255, 0, 0), (battle_men_son[0][0] - camera.rect[0], battle_men_son[0][1] - camera.rect[1], battle_men_son[0][2], battle_men_son[0][3]), 2)
+    #pg.draw.rect(win, (255, 0, 0), (battle_men_son[0][0] - camera.rect[0], battle_men_son[0][1] - camera.rect[1], battle_men_son[0][2], battle_men_son[0][3]), 2)
     # показывает спрайт персоонажа
     
     # показывает второй уровень пока
@@ -209,10 +215,32 @@ while  1:
 #        win.blit(text_surface, (40, 250))
 # другие обькты
     prop_objects = sorted(prop_objects, key=lambda x: [x.rect[0], x.rect[1]])
-    #[recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)] sorted(puzzles[xislo], key=lambda x: [x[0][0], x[0][1]])
-    [win.blit(i._surface[0], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
-    [win.blit(i._surface[1], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
-    win.blit(pleer, (680, 384))
+    #[recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)]
+    recursion_otr()
+    if bj_:
+        #pg.draw.rect(win, (100, 100, 100), bj)#(bj[0], bj[1], bj[2], bj[3]))
+        
+        for i in card.interaction_layer:
+            if bj.colliderect(i[0]):
+                
+                if i[3] == 'Сундук':
+                    if i[2][-1] != False:
+                        dialog_men.aktv = True
+                        bf = ('/').join([f"{d[0]} {d[1]} штука" for d in i[2][0]])
+                        i[4].chest[-1] = False
+                        text.text_update(bf)
+                else:
+                    with open(f"text/{i[2]}", 'r', encoding='utf-8') as file:
+                        #bag = (file.readline()).strip().split(', ')
+                        bf = file.readline()
+                    dialog_men.aktv = True
+                    text.text_update(bf)
+        bj_ = False
+    card.drawing_layers()
+
+    #[win.blit(i._surface[0], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
+    #[win.blit(i._surface[1], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
+    #win.blit(pleer, (680, 384))
     #win.blit(dereo, (1400 - camera.rect[0], 768 - camera.rect[1]))
     #win.blit(pla, (vector[0], 512 - vector[1]))
     #win.blit(text1, (50, 600))
@@ -226,6 +254,6 @@ while  1:
     fps.output()
     #win.blit(dre, (50 - camera.rect[0], 600 - camera.rect[1]))
     pg.display.flip() ##    = pg.display.update()
-    clock.tick(300)
+    clock.tick(60)
     pg.time.wait(1)
 # 0.17
