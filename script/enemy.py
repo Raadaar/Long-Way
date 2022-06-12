@@ -95,6 +95,9 @@ class enemy_class:
         #[self.resistance.pop(i, None) for i in list(filter(lambda x: self.resistance[x] == 0, self.resistance.keys()))]
         self.ability = []
         self.magic = []
+        self.memory_of_attacks = []
+        self.memory_of_damage = []
+        self.list_of_available_actions = ['Атака', 'Защита', *self.ability, *self.magic]
     def state_transition(self):
         for pak in self.condition:
             if pak[0] in ('баф', 'дебаф'):
@@ -118,6 +121,29 @@ class enemy_class:
         else:
             vbr = random.choice(self.magic)
             vbr.using(self, command, host, 0)
+        x = random.random() # Выбор или изучение
+        if x == 0:
+            choice = random.choice(self.list_of_available_actions)
+            if choice in ['Атака', 'Защита']:
+                if choice == 'Атака':
+                    host[0].HP -= self.specifications['Атака']
+                    self.memory_of_attacks.append(['Атака', self.specifications['Атака']])
+                    del self.list_of_available_actions[self.list_of_available_actions.index('Атака')]
+                else:
+                    pass
+            else:
+                choice.using(self, command, host, 0)
+                self.memory_of_attacks.append([choice, choice.using(self, command, host, 0, data_output=False)])
+                del self.list_of_available_actions[self.list_of_available_actions.index(choice)]
+        else:
+            if len(self.memory_of_attacks) > 0:
+                choice = sorted(self.memory_of_attacks, key=lambda c: c[1])[0]
+                if choice == 'Атака':
+                    host[0].HP -= self.specifications['Атака']
+                elif choice == 'Защита':
+                    pass
+                else:
+                    choice.using(self, command, host, 0)            
 def converting_text_to_enemy_class(ite):
     list_skill = []
     index_dictionary = ['Атака', 'Защита', 'Магия', 'Воля', 'Ловкость', 'Сноровка',
@@ -146,4 +172,4 @@ def life_check(ene):
     pass
 #copy.deepcopy()
 enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Земляной разлом v2'])
-enemy_combat_zone = [combat_zone((0,0,20,20), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]
+enemy_combat_zone = [combat_zone((0,0,100,100), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]

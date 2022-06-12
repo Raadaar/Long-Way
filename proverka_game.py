@@ -222,17 +222,8 @@ while  1:
         
         for i in card.interaction_layer:
             if bj.colliderect(i[0]):
-                
-                if i[3] == 'Сундук':
-                    if i[2][-1] != False:
-                        dialog_men.aktv = True
-                        bf = ('/').join([f"{d[0]} {d[1]} штука" for d in i[2][0]])
-                        i[4].chest[-1] = False
-                        text.text_update(bf)
-                else:
-                    with open(f"text/{i[2]}", 'r', encoding='utf-8') as file:
-                        #bag = (file.readline()).strip().split(', ')
-                        bf = file.readline()
+                bf = i[1]()
+                if bf != False:
                     dialog_men.aktv = True
                     text.text_update(bf)
         bj_ = False

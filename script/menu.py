@@ -14,6 +14,21 @@ pleeer.spells.append(class_magic.magic_dictionary['Водный поток'])
 pleeer.spells.append(class_magic.magic_dictionary['Святое проклятье'])
 pleeer.adility.append(class_ability.ability_dictionary['Удар кинжалом'])
 pleeer.adility.append(class_ability.ability_dictionary['Удар ногой'])
+class Money:
+    def __init__(self) -> None:
+        self.__money = 0
+    
+    @property
+    def money(self):
+        return self.__money
+    
+    @money.setter
+    def money(self, new):
+        if self.__money + new < 0:
+            self.__money = 0
+        else:
+            self.__money = self.__money + new
+money = Money()
 class class_fps:
     def __init__(self) -> None:
         self.fps = 0
@@ -35,13 +50,13 @@ class class_fps:
                 self.min_max[1] = self.fps_pro
             self.fps = 0 
 fps = class_fps()
-def maping(pati): # mapping  
+def maping(pati, s): # mapping  
     for pleeer in pati:     
         pg.draw.rect(win, (36, 255, 24), (63, 388, 1 + round(pleeer.SP * (80 // pleeer.MaxSP)), 50))
         pg.draw.rect(win, (24, 70, 255), (63, 450, 1 + round(pleeer.MP * (130 // pleeer.MaxMP)), 50))
         pg.draw.rect(win, (255, 24, 82), (63, 505, 1 + round(pleeer.HP * (210 // pleeer.MaxHP)), 50))
 class spreadsheet:
-    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[[[0,], ], False], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=lambda x, c: x, additional_functionality=(), additional_value=(), dop_sprai=[['', ],], additional_tap=lambda x: x, ak = False) -> None:
+    def __init__(self, s, n_r=(0,0), p_r=(0,0), s_r='', g_r=(0,0), tab=[[[0,], ], False], prin_tab='', text=(('', (0, 0, 0), (0, 0)), ), inactive_display='', dop_ot=[lambda x, c: x, None], additional_functionality=(), additional_value=(), dop_sprai=[['', ],], additional_tap=lambda x: x, ak = False) -> None:
         self.sprait = s # Спрайт
         self.dop_spait = dop_sprai
         self.sprait_ram = s_r # Спрайт рамки
@@ -54,7 +69,7 @@ class spreadsheet:
         self.prin_tab = prin_tab # Принцип отрисовки таблицы
         self.ak = ak # Активность таблицы
         self.additional_functionality = additional_functionality
-        self.dop_ot = dop_ot
+        self.dop_ot = dop_ot # [Функция отрисовки, последовательность выполнения]
         self.inactive_display = inactive_display
         self.additional_value = additional_value
         self.additional_key = False
@@ -97,11 +112,13 @@ class spreadsheet:
                 self.p += slow[kyda]
             print(self.p)
     def output(self):
-        #self.dop_ot(self, fps) 04.06 дата изменения
+        if self.dop_ot[1] == 0:
+            self.dop_ot[0](self, fps) #04.06 дата изменения
         if self.inactive_display != '':
             self.inactive_display[0](self.inactive_display[1], self)
         win.blit(self.sprait, (0, 0))
-        self.dop_ot(self, fps) # 04.06 дата изменения
+        if self.dop_ot[1] == 1:
+            self.dop_ot[0](self, fps) # 04.06 дата изменения
         if len(self.dop_spait[0]) > 1:
             for pak in self.dop_spait:
                 win.blit(pak[0], pak[1])
@@ -335,17 +352,17 @@ battle_men = meni(
     (
         (('Низ', 'Верх'), 5),
     (
-        spreadsheet(s=men_batlle, dop_sprai=[[men_batlle_ram, (0, 564)],], additional_tap=script.enemy.batlee.peredv, dop_ot=script.enemy.batlee.maping, ak=True, inactive_display=[maping, pati]),
+        spreadsheet(s=men_batlle, dop_sprai=[[men_batlle_ram, (0, 564)],], additional_tap=script.enemy.batlee.peredv, dop_ot=[script.enemy.batlee.maping, 0], ak=True, inactive_display=[maping, pati]),
         #spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 2), prin_tab=iventar.otrisovka)
     ),
     (
-        spreadsheet(s=men_batlle, s_r=men_batlle_v, dop_sprai=[[men_batlle_ram, (0, 604)],], additional_tap=script.enemy.batlee.peredv, dop_ot=script.enemy.batlee.maping, n_r=(160, 564), p_r=(300, 20), g_r=(1360, 768), prin_tab=display_abilities.rendering_interface, tab=((pleeer.spells, ), False), inactive_display=[maping, pati]),
+        spreadsheet(s=men_batlle, s_r=men_batlle_v, dop_sprai=[[men_batlle_ram, (0, 604)],], additional_tap=script.enemy.batlee.peredv, dop_ot=[script.enemy.batlee.maping, 0], n_r=(160, 564), p_r=(300, 20), g_r=(1360, 768), prin_tab=display_abilities.rendering_interface, tab=((pleeer.spells, ), False), inactive_display=[maping, pati]),
     ),
     (
-        spreadsheet(s=men_batlle, s_r=men_batlle_v, dop_sprai=[[men_batlle_ram, (0, 644)],], additional_tap=script.enemy.batlee.peredv, dop_ot=script.enemy.batlee.maping, n_r=(160, 564), p_r=(300, 20), g_r=(1360, 768), prin_tab=display_abilities.rendering_interface, tab=((pleeer.adility, ), False), inactive_display=[maping, pati]),
+        spreadsheet(s=men_batlle, s_r=men_batlle_v, dop_sprai=[[men_batlle_ram, (0, 644)],], additional_tap=script.enemy.batlee.peredv, dop_ot=[script.enemy.batlee.maping, 0], n_r=(160, 564), p_r=(300, 20), g_r=(1360, 768), prin_tab=display_abilities.rendering_interface, tab=((pleeer.adility, ), False), inactive_display=[maping, pati]),
     ),
     (
-        spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), dop_sprai=[[men_batlle, (0,0)], [men_batlle_ram, (0,684)]], dop_ot=script.enemy.batlee.maping, s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 0), prin_tab=iventar.otrisovka, inactive_display=[maping, pati]),
+        spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), dop_sprai=[[men_batlle, (0,0)], [men_batlle_ram, (0,684)]], dop_ot=[script.enemy.batlee.maping, 0], s_r=ramka_inventar, n_r=(560, 75), p_r=(266, 25), g_r=(1360, 500), tab=((iventar.sorti, ), 0), prin_tab=iventar.otrisovka, inactive_display=[maping, pati]),
     ),
     (
         spreadsheet(s=men_batlle, dop_sprai=[[men_batlle_ram, (0, 724)]], ak=True, inactive_display=[maping, pati]),
@@ -356,7 +373,7 @@ dialog_men = meni(
     (
         (('Низ', 'Верх'), 1),
     (
-        spreadsheet(s=pla, ak=True, dop_ot=text.otr),
+        spreadsheet(s=pla, ak=True, dop_ot=[text.otr, 1]),
     ),
     )
     )

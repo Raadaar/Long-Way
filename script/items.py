@@ -98,7 +98,7 @@ class armor(equipment): # Броня/снарежение
                 name_obj.chances[key] -= self.chances[key]
             for key in self.resistance.keys():
                 name_obj.resistance[key] -= self.resistance[key] 
-class ring(equipment):
+class ring(equipment): # Кольца
     def __init__(self, kind, title='', maxmp=0, maxhp=0, ataka=0, pro=0, mag=0, wil=0, agil=0, dext=0, accuracy=0, critic=0, dodg=0, mag_dodge=0, counte_str=0, counte_str_mag=0, cru=0, cu=0, pie=0, sh_l=0, sh_h=0, ea=0, wa=0, fi=0, ai=0, lig=0, da=0):
         super().__init__(kind, title, ataka, pro, mag, wil, agil, dext, accuracy, critic, dodg, mag_dodge, counte_str, counte_str_mag, cru, cu, pie, sh_l, sh_h, ea, wa, fi, ai, lig, da)
         self.MaxMP = maxmp

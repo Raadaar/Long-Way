@@ -3,6 +3,28 @@ from script.base_classes import player, object, camera
 import script.guide
 chest = pg.image.load(script.guide.path + "\\aset\\chest.png").convert_alpha()
 nps = pg.image.load(script.guide.path + "\\aset\\nps.png").convert_alpha()
+
+class object_interaction:
+    def __init__(self, data) -> None:
+        self.data = data
+
+class Nps(object_interaction):
+    def __init__(self, data) -> None:
+        super().__init__(data)
+    def interaction(self):
+        with open(f"text/{self.data}", 'r', encoding='utf-8') as file:
+            bf = file.readline()
+        return bf
+class Chest(object_interaction):
+    def __init__(self, data, activation=False) -> None:
+        super().__init__(data)
+        self.activation = activation
+    def interaction(self):
+        if self.activation == True:
+            return False
+        self.activation = True
+        return ('/').join([f"{d[0]} {d[1]} штука" for d in self.data])    
+
 class object:
     ##  Это какой-нибудь объект, отличный игрока (к примеру враг или дерево)
     def __init__(self, x, y, width, height, RGP=(255, 0, 0), spr=[], py=[]):
@@ -11,20 +33,20 @@ class object:
         self.sprait = spr
         self.py_sprai = py
         self.barrier = False
-        self.chest = [[],]
-        self.nps = []
+        self.chest = False
+        self.nps = False
     def draw(self):
         ##  Чтобы отрисовка соответствовала позиции объекта его нужно отрисовывать
         ##  на self.rect[0]-camera.rect[0], self.rect[1]-camera.rect[1]
         if self.sprait != "":
                 card.layer_one.append([card.sprites[self.sprait], (self.rect[0], self.rect[1])]) 
     def interaction_check(self, map):
-        if self.barrier != 'False':
+        if self.barrier == 'False':
             map.layer_barriers.extend(pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50))
-        if self.chest[0][0] != ['']:
-            map.interaction_layer.append((pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50), chest, self.chest, 'Сундук', self))
-        if self.nps != '[]':
-            map.interaction_layer.append((pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50), nps, self.nps, 'NPS'))
+        if self.chest != False:
+            map.interaction_layer.append((pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50), self.chest.interaction, chest))
+        if self.nps != False:
+            map.interaction_layer.append((pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50), self.nps.interaction, nps))
     def dop(self, v):
         self.sprait = [*self.sprait, v[0]]
         self.py_sprai = [*self.py_sprai, v[1]]
@@ -70,9 +92,10 @@ class small_chunk:
                 else:
                     pred.sprait = pust
             pred.barrier = i[4][1]
-            pred.chest[0] = [d.split('$') for d in i[4][2].split('!')]
-            pred.chest.append(True)
-            pred.nps = i[4][3]
+            if i[4][2] != '':
+                pred.chest = Chest([d.split('$') for d in i[4][2].split('!')])
+            if i[4][3] != '[]':
+                pred.nps = Nps(i[4][3])
             x.append(pred)
         self.compound = tuple(x)
 prop_objects = []
@@ -120,7 +143,7 @@ class Map_class:
         #    #for i in layers:
         #    #    win.blit(i[0], (i[1][0] - camera.rect[0], i[1][1] - camera.rect[1]))
         win.blits([[i[0], (i[1][0] - camera.rect[0], i[1][1] - camera.rect[1])] for i in self.layer_one])
-        [win.blit(i[1], i[0]) for i in self.interaction_layer]
+        [win.blit(i[2], i[0]) for i in self.interaction_layer]
         player.draw()
         win.blits([[i[0], (i[1][0] - camera.rect[0], i[1][1] - camera.rect[1])] for i in self.layer_two])
         self.layer_one = [] # Первый слой пол
