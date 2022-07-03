@@ -44,7 +44,7 @@ class skill:
                         if data_output:
                             d[i] += self.dam[i]
                         else:
-                            return self.dam[i]
+                            return self.dam[i] * self.time
     def replenishment(self, user, choice=False, data_output=False): # choice, data_output
         for i in self.dam.keys():
             if data_output:
@@ -148,6 +148,8 @@ class class_ability(skill):
     def using(self, utilizing, command, host, choice, data_output=True):
         utilizing.SP = utilizing.SP - self.consumption if utilizing.SP - self.consumption >= 0 else 0
         return super().using(utilizing, command, host, choice, data_output)
+    def possibility(self, user):
+        return True if user.SP >= self.consumption else False
 class class_magic(skill):
     magic_dictionary = {}
     def __init__(self, title, application, action, dam, consumption, time=0, view='') -> None:
@@ -156,7 +158,9 @@ class class_magic(skill):
         self.consumption = consumption # Потребление магии
     def using(self, utilizing, command, host, choice, data_output=True):
         utilizing.MP = utilizing.MP - self.consumption if utilizing.MP - self.consumption >= 0 else 0
-        return super().using(utilizing, command, host, choice, data_output) 
+        return super().using(utilizing, command, host, choice, data_output)
+    def possibility(self, user):
+        return True if user.MP >= self.consumption else False
 def converting_text_to_skill(skil):
     e = ["Баф", "дебаф", "наполнение", "урон"]
     sl = {}

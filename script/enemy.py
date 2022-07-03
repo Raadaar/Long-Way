@@ -94,10 +94,11 @@ class enemy_class:
         self.resistance = {'Дробящий': cru, 'Режущий': cu, 'Пронзающий': pie, 'Стрелковый лёгкий': sh_l, 'Стрелковый тяжелый': sh_h, 'Земляной': ea, 'Водный': wa, 'Огненный': fi, 'Воздушный': ai, 'Святой': lig, 'Тёмный': da}
         #[self.resistance.pop(i, None) for i in list(filter(lambda x: self.resistance[x] == 0, self.resistance.keys()))]
         self.ability = []
+        self.memory = []
         self.magic = []
         self.memory_of_attacks = []
         self.memory_of_damage = []
-        self.list_of_available_actions = ['Атака', 'Защита', *self.ability, *self.magic]
+        self.list_of_available_actions = [*self.ability, *self.magic] 
     def state_transition(self):
         for pak in self.condition:
             if pak[0] in ('баф', 'дебаф'):
@@ -115,35 +116,94 @@ class enemy_class:
                     del self.condition[self.condition.index(pak)]        
 
     def combat_logic(self, command, host):
-        ch = random.choice(['Атака', 'Магия'])
-        if ch == 'Атака':
-            host[0].HP -= self.specifications['Атака']
+        #ch = random.choice(['Атака', 'Магия'])
+        #if ch == 'Атака':
+        #    host[0].HP -= self.specifications['Атака']
+        #else:
+        #    vbr = random.choice(self.magic)
+        #    vbr.using(self, command, host, 0)
+#Выбор этих двух *или* будет зависеть от рандома и количества изученных атак то есть если изученные все действие большая вероятность на осмысленную атаку $
+#Если все действие с неизвестным результатом = случайное действие $
+#Или: $
+#Случайное действие (заклинание, способность, защита или атака (лечение только если хп не полные )) $
+#Результат действия записывается в изученное и туда же добавляется  результат эффективности. # пример (нанесённый урон, само заклинание) $
+#Или: $
+#	В зависимости от количества хп крутиться рандом чем меньше хп, больше шанс на лечение $
+#Смотрит на здоровие и выберает максимально эфективное лечение # Способности по лечению изначально имеют известный эффект действия $
+#	или 
+#Выбирает эффективные бафы и дебафы (узнавать слабости врага в нашем случае игрока он будет из своих атак, то есть если он атакует молнией то узнает защиту игрока на данный момент, важное замечание если игрок после этого использует защиту от молний то враг об этом узнает только после следующей атаки с использованием аспекта молний и если действие твоей защиты закончиться враг об этом узнает опять таки только после молнии) и использует максимально эффективное на себя/врага
+#если
+#прошлые действия не имели эффекта или не изучены или так    благоволит рандом враг атакует опять таки максимально эффективным действием.
+        self.list_of_available_actions = [*self.ability, *self.magic]
+        if len(self.memory_of_attacks) == 0:
+            self.memory_of_attacks = [[[], {'Дробящий': 100, 'Режущий': 100, 'Пронзающий': 100, 'Стрелковый лёгкий': 100, 'Стрелковый тяжелый': 100, 'Земляной': 100, 'Водный': 100, 'Огненный': 100, 'Воздушный': 100, 'Святой': 100, 'Тёмный': 100}] for _ in range(len(host))]
+        if len(self.memory_of_attacks[0][0]) >= len(self.list_of_available_actions) // 2:
+            x = random.random() # Выбор или изучение
         else:
-            vbr = random.choice(self.magic)
-            vbr.using(self, command, host, 0)
-        x = random.random() # Выбор или изучение
+            #x = 0 if len(self.list_of_available_actions) > len(self.memory_of_attacks[0][0]) else 1
+            x = 0 if random.randint(1, len(self.list_of_available_actions)) > len(self.memory_of_attacks[0][0]) else 1
+        study_list = []
+        for s in self.list_of_available_actions: # Убираем уже известные зак/спос
+            if s not in [i[0] for i in self.memory_of_attacks[0][0]]:
+                study_list.append(s)
+            #for i in self.memory_of_attacks[0][0]:
+            #    if s.title not in i[0]:
+            #        if s not in study_list:
+            #            study_list.append(s)
         if x == 0:
-            choice = random.choice(self.list_of_available_actions)
+            study_list = [d for d in study_list if d.possibility(self)] # Убираем невозможные действия
+            if self.HP == self.MaxHP:
+                study_list = [d for d in study_list if d.action != 'наполнение' and d.view != 'Жизнь']
+            choice = random.choice(['Атака', 'Защита', *study_list])
             if choice in ['Атака', 'Защита']:
                 if choice == 'Атака':
                     host[0].HP -= self.specifications['Атака']
-                    self.memory_of_attacks.append(['Атака', self.specifications['Атака']])
-                    del self.list_of_available_actions[self.list_of_available_actions.index('Атака')]
+                    #self.memory_of_attacks.append(['Атака', self.specifications['Атака']])
+                    #del self.list_of_available_actions[self.list_of_available_actions.index('Атака')]
+                    print('Случайная атака')
                 else:
-                    pass
+                    print(f'случайная Защита')
             else:
                 choice.using(self, command, host, 0)
-                self.memory_of_attacks.append([choice, choice.using(self, command, host, 0, data_output=False)])
-                del self.list_of_available_actions[self.list_of_available_actions.index(choice)]
+                self.memory_of_attacks[0][0].append([choice.title, choice, choice.using(self, command, host, 0, data_output=False)])
+                #for d in [user.specifications, user.chances, user.resistance]:
+                for da in choice.dam.keys():
+                    if da in self.memory_of_attacks[0][1].keys():
+                        self.memory_of_attacks[0][1][da] = host[0].resistance[da]
+                print(f'случайное действие {choice.title}')
+                    #for i in self.dam.keys():
+                    #    if i in d:
+                    #        if data_output:
+                #self.memory_of_attacks[0][1]
+                #del self.list_of_available_actions[self.list_of_available_actions.index(choice)]
         else:
-            if len(self.memory_of_attacks) > 0:
-                choice = sorted(self.memory_of_attacks, key=lambda c: c[1])[0]
-                if choice == 'Атака':
-                    host[0].HP -= self.specifications['Атака']
-                elif choice == 'Защита':
-                    pass
-                else:
-                    choice.using(self, command, host, 0)            
+
+            choice = [d for d in self.memory_of_attacks[0][0] if d[1].possibility(self)] 
+            # Убираем невозможные действия
+            if random.randint(0, self.MaxHP) > self.HP:
+                xil = [[d, d.using(self, command, host, 0, data_output=False)] for d in choice if d[1].action == 'наполнение' and d[1].view == 'Жизнь']
+                xil = [i for i in xil if i[1] + self.HP <= self.MaxHP]
+                if len(xil) > 0:
+                    xil = sorted(xil, lambda x: x[1])[0][0]
+                    xil.using(self, command, host, 0)  
+                    print(f'хил {xil.title}') 
+                    return       
+            #choice = sorted(self.memory_of_attacks[0], key=lambda c: c[2])
+            x = random.randint(1, 15)
+            #if x < 5:
+            #    pass
+            choice = sorted([['Атака', '', self.specifications['Атака']], ['Защита', '', self.specifications['Защита']], *choice], key=lambda c: c[2])[-1]
+            #choice = random.choice(['Атака', 'Защита', *choice])
+            if choice[0] == 'Атака':
+                host[0].HP -= self.specifications['Атака']
+                print(f'Атака')
+            elif choice[0] == 'Защита':
+                print(f'Защита')
+            else:
+                print(f'{choice[1].title}')
+                choice[1].using(self, command, host, 0)
+                vs = [[i[0] for i in self.memory_of_attacks[0][0]].index(choice[0])]
+                self.memory_of_attacks[0][0][[i[0] for i in self.memory_of_attacks[0][0]].index(choice[0])][2] = choice[1].using(self, command, host, 0, data_output=False)           
 def converting_text_to_enemy_class(ite):
     list_skill = []
     index_dictionary = ['Атака', 'Защита', 'Магия', 'Воля', 'Ловкость', 'Сноровка',
@@ -170,6 +230,10 @@ with open('script/enemy.txt', 'r', encoding='utf-8') as file:
         converting_text_to_enemy_class(line.strip().split('_'))
 def life_check(ene):
     pass
-#copy.deepcopy()
+#copy.deepcopy()Водный поток v2
 enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Земляной разлом v2'])
+enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Водный поток v2'])
+enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Огненный удар v2'])
+enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Воздушный толчок v2'])
+enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Тёмное благословление v2'])
 enemy_combat_zone = [combat_zone((0,0,100,100), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]

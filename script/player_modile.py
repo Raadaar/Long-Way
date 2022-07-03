@@ -49,7 +49,7 @@ class Pleeer:
         #=-/
         # Словарь сопротивлений
         self.resistance = {'Дробящий': cru, 'Режущий': cu, 'Пронзающий': pie, 'Стрелковый лёгкий': sh_l,
-         'Стрелковый тяжолый': sh_h, 'Земляной': ea, 'Водный': wa, 'Огненый': fi, 'Воздушный': ai,
+         'Стрелковый тяжелый': sh_h, 'Земляной': ea, 'Водный': wa, 'Огненный': fi, 'Воздушный': ai,
          'Святой': lig, 'Тёмный': da}
         # Словарь заклинаний
         self.spells = []
@@ -86,5 +86,5 @@ class Pleeer:
                 creature.duration = creature.total_duration
                 creature.using(reverse_application=True)
                 del self.condition[self.condition.index[creature]]
-pleeer = Pleeer('Pler', 20, 10, 3, 5, 3, 2, 3, 5, 2)
-vrag = Pleeer('Vrag', 20, 10, 3, 5, 3, 2, 3, 5, 2, dodg=30)
+pleeer = Pleeer('Pler', 200, 100, 3, 5, 3, 2, 3, 5, 2, wa=30)
+vrag = Pleeer('Vrag', 20, 10, 3, 5, 3, 2, 3, 5, 2, dodg=30, wa=30)
