@@ -42,7 +42,7 @@ class Player:
         #win.blit(self.hero_atlas[0][1], (680, 384, 50, 50))
         #pg.draw.rect(win, (0, 100, 0), (240, 240, 10, 10))
 camera = cam(0,0)
-player = Player(0, 0)
+player = Player(0,0)
 class object:
     ##  Это какой-нибудь объект, отличный игрока (к примеру враг или дерево)
     def __init__(self, x, y, width, height, RGP=(255, 0, 0), spr=[], py=[]):

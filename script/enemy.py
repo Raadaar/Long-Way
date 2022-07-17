@@ -3,6 +3,9 @@ import copy
 import script.start_game as sg
 import script.guide
 from script.skill import skill, class_ability, class_magic
+from script.quest import Quest
+from script.inven import iventar
+from script.items import thing
 '''
 Запуск игры
 Загружается карта вместе с ней зоны с врагами
@@ -19,11 +22,13 @@ class combat_zone:
         self.sprait_fon = s # Фоновый спрайт 
     def beginning_battle(self, sel):        
         sel.enemy_list = [copy.deepcopy(self.enemis[random.randint(0, len(self.enemis) - 1)]) for _ in range(random.randint(1, len(self.enemis)))] # Даёт случайное количество врагов от одного до бесконечности
+        sel.seif_enemy_list = ['уб', *[i.name for i in sel.enemy_list]]
         sel.sprait_fon = self.sprait_fon 
 # Активный бой
 class batlee_class:
     def __init__(self) -> None:
         self.enemy_list = [] # Список врагов
+        self.seif_enemy_list = [] # Для квестов
         self.sprait_fon = '' # Фоновый спрайт 
         self.choise = 0 # Выбранный враг
     def bat(self, pati):
@@ -45,7 +50,7 @@ class batlee_class:
                 self.choise += slow[kyda]
                 if self.choise == len(self.enemy_list):
                     self.choise = 0
-    def maping(self, bat, fps): # mapping
+    def maping(self, bat, fps, osnova): # mapping
         fps = fps.fps
         fps = (60 - fps if fps > 30 else fps)
         sg.win.blit(self.sprait_fon, (0, 0))
@@ -61,6 +66,11 @@ class batlee_class:
             else:
                 sg.win.blit(spr, (center, 100))
             sg.pg.draw.rect(sg.win, (68, 148, 74), (center + 30, 90, round((enem.HP * (100 / enem.MaxHP)) * ((spr.get_width() - 30) / 100)), 10))
+        if len([i for i in self.enemy_list if i.HP > 0]) <= 0:
+            iventar.dopov([thing.list_of_items['духовная энергия'], random.randint(1, 3)])
+            osnova.aktv = False
+            Quest.search(self.seif_enemy_list)
+            ### 
         # pg.draw.rect(win, (0, 100, 0), (680, 384, 50, 50))
         # get_width()
 pati = []
@@ -138,7 +148,7 @@ class enemy_class:
         if len(self.memory_of_attacks) == 0:
             self.memory_of_attacks = [[[], {'Дробящий': 100, 'Режущий': 100, 'Пронзающий': 100, 'Стрелковый лёгкий': 100, 'Стрелковый тяжелый': 100, 'Земляной': 100, 'Водный': 100, 'Огненный': 100, 'Воздушный': 100, 'Святой': 100, 'Тёмный': 100}] for _ in range(len(host))]
         if len(self.memory_of_attacks[0][0]) >= len(self.list_of_available_actions) // 2:
-            x = random.random() # Выбор или изучение
+            x = random.randint(0, 1) # Выбор или изучение
         else:
             #x = 0 if len(self.list_of_available_actions) > len(self.memory_of_attacks[0][0]) else 1
             x = 0 if random.randint(1, len(self.list_of_available_actions)) > len(self.memory_of_attacks[0][0]) else 1
@@ -236,4 +246,4 @@ enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_diction
 enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Огненный удар v2'])
 enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Воздушный толчок v2'])
 enemy_class.list_of_enemy['Злодей'].magic.append(class_magic.magic_dictionary['Тёмное благословление v2'])
-enemy_combat_zone = [combat_zone((0,0,100,100), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]
+enemy_combat_zone = [combat_zone((0,0, 1000, 1000), [copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']),copy.deepcopy(enemy_class.list_of_enemy['Злодей']), ], sg.pg.image.load(script.guide.path + "\\aset\\sac_b_les.png").convert_alpha()), ]

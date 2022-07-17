@@ -18,7 +18,7 @@ class interface:
         self.bias = sme
         # Список индексов и их расположения (или просто текста) в одном кортеже в ячейке по типу ((index, x, y), (index, x, y)))
         self.ind = spi_ind
-    def rendering_interface(self, spi):
+    def rendering_interface(self, spi, osnova):
         if self.show_sprait == True:
             win.blit(self.sprait, self.coordinates)
         x = self.dimensions[0]
@@ -45,13 +45,13 @@ dressed_item_chances_v2 = interface('',                  (0, 0), (765, 330, 765,
 dressed_item_resistance_v2 = interface('',               (0, 0), (1065, 330, 765, 280), (150, 25), lambda i, x, y: win.blit(f1.render(str(i[0]), True, (180, 100, 0)), (x + 2, y + 2)), lambda i, x, y: win.blit(f1.render(str(i[1]), True, (180, 100, 0)), (x + 130, y + 2)), s=False)
 display_abilities = interface('',                        (0, 0), (160, 546, 1360, 760), (300, 20), lambda i, x, y: win.blit(f1.render(str(i.title), True, (180, 100, 0)), (x + 2, y + 16)), lambda i, x, y: win.blit(f1.render(str(i.consumption), True, (180, 100, 0)), (x + 280, y + 15)), s=False)
 gr = interface(men_sn_ok[1],(0, 0), (0, 484, 1360, 764), (136, 28), lambda i, x, y: win.blit(f1.render(str(i[0].title), True, (180, 100, 0)), (x + 2, y + 2)), lambda i, x, y: win.blit(f1.render(str(i[1]), True, (180, 100, 0)), (x + 126, y + 2)))
-def showing_properties(pak):
+def showing_properties(pak, osnowa):
     carrier, eq = pak # Для удобства создания меню в pak запакованно carrierr/носитель eq где он надет (голова, туловище и т.д)
     if isinstance(eq, str):
         if carrier.equipment[eq] != '':
             subject = carrier.equipment[eq] # Надетый предмет
             # В списки переберается (метод, словарь характеристик) после они преобразуются с помощью map в (название характиристики, её значение) и вызывается метод показа с этим списком
-            [show.rendering_interface(list(map(lambda x: (x, characteristics[x]), characteristics.keys()))) for show, characteristics in ((dressed_item_specifications, subject.specifications), (dressed_item_chances, subject.chances), (dressed_item_resistance, subject.resistance))]
+            [show.rendering_interface(list(map(lambda x: (x, characteristics[x]), characteristics.keys())), osnowa) for show, characteristics in ((dressed_item_specifications, subject.specifications), (dressed_item_chances, subject.chances), (dressed_item_resistance, subject.resistance))]
             #print(subject.specifications.values())
             #dressed_item_specifications.rendering_interface(subject.specifications.values)
             #dressed_item_chances.rendering_interface(subject.chances.values)

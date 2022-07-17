@@ -246,4 +246,5 @@ def converting_things_from_text_format_to_game_class(ite):
 with open('items.txt', 'r', encoding='utf-8') as file:
     for line in file:
         converting_things_from_text_format_to_game_class(line.strip().split('_'))
+food('духовная энергия', mp=5) # Для квеста
 #pleeer

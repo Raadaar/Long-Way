@@ -44,7 +44,7 @@ class inventory_class:
         if prov == False:
             self.inventory.append(pr)
     # Отрисовывает название вещей в инвенторе
-    def otrisovka(self, spis):
+    def otrisovka(self, spis, osnova):
         visata = 75
         dlina = 275
         perexod = 0

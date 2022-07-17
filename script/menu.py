@@ -64,7 +64,7 @@ class spreadsheet:
         self.moving_coordinates = p_r # координаты передвежения рамки
         self.p = 0 # Выбор предмета в списке + передвежение рамки
         self.p1 = g_r # Границы передвежения рамки
-        self.p2 = '' # Границф
+        self.p2 = '' # Границ
         self.list_getting_table = tab # Таблица с которой надо работать ((преобразующие функии/словари), начальный аргумент)
         self.prin_tab = prin_tab # Принцип отрисовки таблицы
         self.ak = ak # Активность таблицы
@@ -111,25 +111,28 @@ class spreadsheet:
             if self.p + slow[kyda] >= 0:
                 self.p += slow[kyda]
             print(self.p)
-    def output(self):
+    def output(self, osnova):
         if self.dop_ot[1] == 0:
-            self.dop_ot[0](self, fps) #04.06 дата изменения
+            self.dop_ot[0](self, fps, osnova)
         if self.inactive_display != '':
             self.inactive_display[0](self.inactive_display[1], self)
+
         win.blit(self.sprait, (0, 0))
         if self.dop_ot[1] == 1:
-            self.dop_ot[0](self, fps) # 04.06 дата изменения
+            self.dop_ot[0](self, fps)
+
         if len(self.dop_spait[0]) > 1:
             for pak in self.dop_spait:
                 win.blit(pak[0], pak[1])
         if self.sprait_ram != '':
             if self.ak != None:
-                self.prin_tab(self.table_list)
+                self.prin_tab(self.table_list, self)
         if self.ak == True:
             self.draw()
-            [ad_fun((self.table_list, self.p)) for ad_fun in self.additional_functionality]
+            [ad_fun((self.table_list, self.p), self) for ad_fun in self.additional_functionality]
 men_os = pg.image.load(script.guide.path + "\\aset\\men\\oc_okn.png").convert_alpha()
 ram_cn = pg.image.load(script.guide.path + "\\aset\\men\\ram_cn.png").convert_alpha()
+ram_qu = pg.image.load(script.guide.path + "\\aset\\men\\quest_ram.png").convert_alpha()
 x = (
     (('Низ', 'Верх'), 7),
     (
@@ -153,6 +156,15 @@ x = (
     ),
     (
         spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Quests.png").convert_alpha()),
+    (
+        (('Право', 'Лево'), 2),
+        (
+            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\quest_a.png").convert_alpha(), s_r=ram_qu, n_r=(0, 60), p_r=(1, 45), g_r=(1, 768), tab=((Quest.sort, ), 1), prin_tab=Quest.otr)
+        ,),
+        (
+            spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\quest_a.png").convert_alpha(), s_r=ram_qu, n_r=(0, 60), p_r=(1, 45), g_r=(1, 768), tab=((Quest.sort, ), 0), prin_tab=Quest.otr)
+        ,)
+    )
     ),
     (
         spreadsheet(s=pg.image.load(script.guide.path + "\\aset\\men\\Equipment.png").convert_alpha()),
@@ -254,9 +266,11 @@ class meni:
             self.pyt.append(self.ataw)
             self.pyt.append(1)
             self.ataw = 1
-        elif ost_pyt[self.ataw][0].ak == True:
-            if inven.aktv == True or str(ost_pyt[self.ataw][0].list_getting_table[1]) == '0':
-                if ost_pyt[self.ataw][0].p - 1 <= len(ost_pyt[self.ataw][0].table_list):
+        elif inven.aktv == True and ost_pyt[1][0].ak == True and ost_pyt[self.ataw][0].additional_key == True:# and ost_pyt[1][0].ak == True or str(ost_pyt[self.ataw][0].list_getting_table[1]) == '0' :
+# self.pyt == [2, 1] or self.pyt == [4, 1] and 
+#        elif ost_pyt[self.ataw][0].ak == True and inven.aktv == True or str(ost_pyt[self.ataw][0].list_getting_table[1]) == '0':
+            if True:#inven.aktv == True or str(ost_pyt[self.ataw][0].list_getting_table[1]) == '0':
+                if ost_pyt[self.ataw][0].p <= len(ost_pyt[self.ataw][0].table_list):
                     choice_number = [i for i in range(len(iventar.inventory)) if iventar.inventory[i][0] == ost_pyt[self.ataw][0].table_list[ost_pyt[self.ataw][0].p][0]][0]
                     iventar.inventory[choice_number][1] = iventar.inventory[choice_number][1] - 1 # Отнимаем от количество
                     if isinstance(iventar.inventory[choice_number][0], equipment): # Если это equipment то using вернёт предмет что был надет
@@ -285,9 +299,9 @@ class meni:
         elif battle_men.aktv == True:
             if self.ataw == 1:
                 if ost_pyt[self.ataw][0].additional_key == True:
+                    ost_pyt[self.ataw][0].additional_key = False
                     self.pyt = []
                     self.ataw = 1
-                    ost_pyt[self.ataw][0].additional_key = False
                     batlee.enemy_list[batlee.choise].HP -= pleeer.specifications['Атака']
                     batlee.bat(pati)
                 else:
@@ -299,12 +313,13 @@ class meni:
                     ost_pyt[self.ataw][0].additional_key = True
                 elif ost_pyt[self.ataw][0].ak == True and ost_pyt[self.ataw][0].additional_key == True:
                     if ost_pyt[self.ataw][0].p < len(pleeer.spells):
-                        self.pyt = []
-                        self.ataw = 1
                         ost_pyt[self.ataw][0].additional_key = False
                         ost_pyt[self.ataw][0].p = 0
                         ost_pyt[self.ataw][0].ak = False
-                        pleeer.spells[ost_pyt[self.ataw][0].p].using(pleeer, pati, batlee.enemy_list, batlee.enemy_list[batlee.choise])
+                        self.pyt = []
+                        self.ataw = 1
+                        #pleeer.spells[ost_pyt[self.ataw][0].p].using(pleeer, pati, batlee.enemy_list, batlee.enemy_list[batlee.choise])
+                        pleeer.spells[ost_pyt[self.ataw][0].p].using(pleeer, pati, batlee.enemy_list, batlee.choise)
                         batlee.bat(pati)   
             elif self.ataw == 3:
                 if ost_pyt[self.ataw][0].ak == False:
@@ -313,21 +328,22 @@ class meni:
                     ost_pyt[self.ataw][0].additional_key = True
                 elif ost_pyt[self.ataw][0].ak == True and ost_pyt[self.ataw][0].additional_key == True:
                     if ost_pyt[self.ataw][0].p < len(pleeer.adility):
-                        self.pyt = []
-                        self.ataw = 1
                         ost_pyt[self.ataw][0].additional_key = False
                         ost_pyt[self.ataw][0].p = 0
                         ost_pyt[self.ataw][0].ak = False
-                        pleeer.adility[ost_pyt[self.ataw][0].p].using(pleeer, pati, batlee.enemy_list, batlee.enemy_list[batlee.choise])
+                        self.pyt = []
+                        self.ataw = 1
+                        #pleeer.adility[ost_pyt[self.ataw][0].p].using(pleeer, pati, batlee.enemy_list, batlee.enemy_list[batlee.choise])
+                        pleeer.adility[ost_pyt[self.ataw][0].p].using(pleeer, pati, batlee.enemy_list, batlee.choise)
                         batlee.bat(pati)
             elif self.ataw == 5:
                 if random.randint(1, 101) > 50:
                     battle_men.aktv = False
-                    self.pyt = []
-                    self.ataw = 1
                     ost_pyt[self.ataw][0].additional_key = False
                     ost_pyt[self.ataw][0].p = 0
                     ost_pyt[self.ataw][0].ak = False
+                    self.pyt = []
+                    self.ataw = 1
                 else:
                     batlee.bat(pati)
             else:

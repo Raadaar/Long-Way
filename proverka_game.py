@@ -1,15 +1,16 @@
 from script.start_game import win, pg, sys, randint, f1
 import script.guide
-from script.map import prop_objects, recursion_otr, card
+from script.map import prop_objects, recursion_otr, card, bar
 # Название игры
 pg.display.set_caption('Long Way')
-from script.base_classes import player, object, camera
+from script.base_classes import player, object, camera, Player, cam
 # делаем слепки обьектов, наверное) 
 #player = Player(0, 0)
 #camera = cam(0, 0)
+doroga = pg.image.load(script.guide.path + "\\aset\\patch32x32transparent.png").convert_alpha()
 men_iven =  [pg.image.load(script.guide.path + "\\aset\\men\\men_ive_items.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive_equipment.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive_important.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\men_ive.png").convert_alpha()]
 ramka = pg.image.load(script.guide.path + "\\aset\\men\\ramka.png").convert_alpha()
-
+zvet = pg.image.load(script.guide.path + "\\aset\\grassi32x32transparent.png").convert_alpha()#grassi32x32transparent
 pleer = pg.image.load(script.guide.path + "\\aset\\pleer.png").convert_alpha()
 battle_men_sprait_men = [pg.image.load(script.guide.path + "\\aset\\men\\oc_m_b.png").convert_alpha()]
 battle_men_ramka_g = [pg.image.load(script.guide.path + "\\aset\\men\\ramka_g_m_b.png").convert_alpha(), pg.image.load(script.guide.path + "\\aset\\men\\ramka_p_sc.png").convert_alpha()]
@@ -22,12 +23,13 @@ text1 = f1.render('Игра ещё не готова, что ты тут дел�
 animation_set = [pg.image.load(script.guide.path + f"\\aset\\GuttyKreumNatureTilesvol1_v2\\AnimationFrames\\Bush/bush32x32transparentanimated{i}.png").convert_alpha() for i in range(1, 14)]
 from script.modile_interface import *
 # inventory_class
+from script.quest import turn, interaction_zones, activation_zones
 from script.items import *
 from script.inven import *
 from script.player_modile import *
 from script.enemy import *
-for i in thing.list_of_items.values():
-    iventar.dopov([i, 1])
+#for i in thing.list_of_items.values():
+#    iventar.dopov([i, 1])
 ######################################################
 from script.menu import inven, battle_men, men_list, fps, dialog_men, text
 ######################################################
@@ -72,7 +74,8 @@ per_re_batl = [False, # Проверка попадает ли игрок в з�
 kno_battle_men = [1, 0]
 # Список боевых зон
 battle_men_son = [pg.Rect(0, 0, 300, 300)]
-
+camera.rect[0], camera.rect[1] = 500, 500
+player.rect[0], player.rect[1] = 500, 500
 frame = 0
 attack_delay = 0
 bj = False
@@ -126,64 +129,73 @@ while  1:
         kpressed = pg.key.get_pressed()
 
     # считывем движения
+        for i in prop_objects:
+            if i.rect.colliderect(camera.rect):
+                for d in i.compound:
+                    if d.rect.colliderect(camera.rect):
+                        for v in d.compound:
+                            if v.rect.colliderect(camera.rect):
+                                [obj.interaction_check_bar(card) for obj in v.compound if obj.rect.colliderect(camera.rect)]
+        if kpressed[pg.K_UP]:
+            player.route = 'up'
+            for border in card.layer_barriers: 
+                testRect = pg.Rect(680, 384 - speed, 50, 50) 
+                # 680 и 384 это центр камеры, там стоит игрок и так как обьекты отображаются относительно камеры, эти кординаты надо отнимать для правильной колизии игрока и этих обьектов
+                #border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
+                # Вот тут я сам хз почему нулевые кординаты, но 1 нужен для проверки колизии)
+                if testRect.colliderect(border):
+                   # Если найден обьект мешающий пройти, кордината онуляется 
+                   vector[1] += speed
+                   break
+            vector[1] -= speed
+        elif kpressed[pg.K_DOWN]:
+            player.route = 'down'
+            for border in card.layer_barriers: 
+                testRect = pg.Rect(680, 384 + speed, 50, 50)  
+                if testRect.colliderect(border):
+                    vector[1] -= speed
+                    break
+            vector[1] += speed
+        if kpressed[pg.K_LEFT]:
+            player.route = 'left'
+            for border in card.layer_barriers:
+                testRect = pg.Rect(680- speed, 384 , 50, 50)  
+                if testRect.colliderect(border):
+                    vector[0] += speed
+                    break
+            vector[0] -= speed
+        elif kpressed[pg.K_RIGHT]:
+            player.route = 'right'
+            for border in card.layer_barriers:
+                testRect = pg.Rect(Player(speed, 0)) 
+                testRect = pg.Rect(680 + speed, 384 , 50, 50)
+                if testRect.colliderect(border):
+                    vector[0] -= speed
+                    break
+            vector[0] += speed
         #if kpressed[pg.K_UP]:
-        #    for border in spic:
-        #        # 680 и 384 это центр камеры, там стоит игрок и так как обьекты отображаются относительно камеры, эти кординаты надо отнимать для правильной колизии игрока и этих обьектов
-        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
-        #        # Вот тут я сам хз почему нулевые кординаты, но 1 нужен для проверки колизии)
-        #        testRect = pg.Rect(Player(0, -speed))  
-        #        if testRect.colliderect(border):
-        #            # Если найден обьект мешающий пройти, кордината онуляется 
-        #            vector[1] += speed
-        #            break
+        #    player.route = 'up'
         #    vector[1] -= speed
+#
         #elif kpressed[pg.K_DOWN]:
-        #    for border in spic:
-        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
-        #        testRect = pg.Rect(Player(0, speed))  
-        #        if testRect.colliderect(border):
-        #            vector[1] -= speed
-        #            break
+        #    player.route = 'down'
         #    vector[1] += speed
 #
         #if kpressed[pg.K_LEFT]:
-        #    for border in spic:
-        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
-        #        testRect = pg.Rect(Player(-speed, 0))  
-        #        if testRect.colliderect(border):
-        #            vector[0] += speed
-        #            break
+        #    player.route = 'left'
         #    vector[0] -= speed
 #
         #elif kpressed[pg.K_RIGHT]:
-        #    for border in spic:
-        #        border = pg.Rect(border[0] - 680, border[1] - 384, border[2], border[3])
-        #        testRect = pg.Rect(Player(speed, 0))  
-        #        if testRect.colliderect(border):
-        #            vector[0] -= speed
-        #            break
+        #    player.route = 'right'
         #    vector[0] += speed
-        if kpressed[pg.K_UP]:
-            player.route = 'up'
-            vector[1] -= speed
-
-        elif kpressed[pg.K_DOWN]:
-            player.route = 'down'
-            vector[1] += speed
-
-        if kpressed[pg.K_LEFT]:
-            player.route = 'left'
-            vector[0] -= speed
-
-        elif kpressed[pg.K_RIGHT]:
-            player.route = 'right'
-            vector[0] += speed
         # Вр зоны
         for border in enemy_combat_zone:
             border_test = pg.Rect(border.re[0] - 680, border.re[1] - 384, border.re[2], border.re[3])
             testRect = pg.Rect(player.rect[0], player.rect[1], 40, 40)
             if testRect.colliderect(border_test):
                 per_re_batl[0] = True
+            else:
+                per_re_batl[0] = False
 
 
         ##  Если игрок ходил
@@ -191,9 +203,14 @@ while  1:
             player.move(vector, fps.fps)
             camera.move(vector)
             if per_re_batl[0] == True:
-                if randint(0, 1000) > 990:
+                if randint(0, 1000) > 990 and False:
                     border.beginning_battle(batlee)
                     akt_fn = battle_men.fkl()
+        for i in activation_zones:
+            pl = pg.Rect(680, 384, player.rect[2], player.rect[3])
+            ix = pg.Rect(i[0] - camera.rect[0], i[1] - camera.rect[1], i[2], i[3])
+            if pl.colliderect(ix):
+                Quest.search(['область', i])
 # делаем фон карты белым
     win.fill((255, 255, 255))
 # показывем игрока
@@ -219,19 +236,23 @@ while  1:
     recursion_otr()
     if bj_:
         #pg.draw.rect(win, (100, 100, 100), bj)#(bj[0], bj[1], bj[2], bj[3]))
-        
         for i in card.interaction_layer:
             if bj.colliderect(i[0]):
                 bf = i[1]()
                 if bf != False:
                     dialog_men.aktv = True
                     text.text_update(bf)
+        for i in interaction_zones:
+            ix = pg.Rect(i[0] - camera.rect[0], i[1] - camera.rect[1], i[2], i[3])
+            if bj.colliderect(ix):
+                Quest.search(['взаимодействие', i])
         bj_ = False
     card.drawing_layers()
-
     #[win.blit(i._surface[0], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
     #[win.blit(i._surface[1], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
-    #win.blit(pleer, (680, 384))
+    win.blit(zvet, (750 - camera.rect[0], 750 - camera.rect[1]))
+    win.blit(doroga, (4215 - camera.rect[0], 4550 - camera.rect[1]))
+    #win.blit(pleer, (680, 384))(750, 750, 50, 50)
     #win.blit(dereo, (1400 - camera.rect[0], 768 - camera.rect[1]))
     #win.blit(pla, (vector[0], 512 - vector[1]))
     #win.blit(text1, (50, 600))
@@ -239,9 +260,11 @@ while  1:
         ost_pyt = i.spis
         if i.aktv == True:
             men_ive_gl = True 
-            ost_pyt[i.ataw][0].output()
+            ost_pyt[i.ataw][0].output(i)
     if sum(i.aktv for i in men_list) == 0:
+        turn.check([dialog_men, text], [player, camera])
         men_ive_gl = False
+    bar = []
     fps.output()
     #win.blit(dre, (50 - camera.rect[0], 600 - camera.rect[1]))
     pg.display.flip() ##    = pg.display.update()

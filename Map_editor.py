@@ -62,7 +62,9 @@ class object:
     def draw(self):
         ##  Чтобы отрисовка соответствовала позиции объекта его нужно отрисовывать
         ##  на self.rect[0]-camera.rect[0], self.rect[1]-camera.rect[1]
-        if str(set(self._surface)) != "{''}":
+        if self.barrier == True:
+            pg.draw.rect(intermediate_surface, (0, 0, 255), (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50))
+        elif str(set(self._surface)) != "{''}":
             if isinstance(self._surface[0], pg.Surface):
                 win.blit(self._surface[0], (self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1])) 
             if isinstance(self._surface[1], pg.Surface):
@@ -125,8 +127,8 @@ player = Player(0, 0)
 camera = cam(0, 0)
 clock = pg.time.Clock()
 objects = []
-x_ = 200 #int(input('Ширина карты '))
-y_ = 200 #int(input('Высота карты '))
+x_ = 100 #int(input('Ширина карты '))
+y_ = 100 #int(input('Высота карты '))
 dre = pg.image.load(sys.path[0] + f"\\aset\\prob_derev.png").convert_alpha()
 tra = pg.image.load(sys.path[0] + "\\aset\\tra.png").convert()
 l = pg.image.load(sys.path[0] + "\\aset\\icon.png").convert()

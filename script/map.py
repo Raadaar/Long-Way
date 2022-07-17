@@ -1,17 +1,20 @@
 from script.start_game import pg, win, path
 from script.base_classes import player, object, camera
 import script.guide
+from script.quest import Quest
 chest = pg.image.load(script.guide.path + "\\aset\\chest.png").convert_alpha()
 nps = pg.image.load(script.guide.path + "\\aset\\nps.png").convert_alpha()
-
+bar = []
 class object_interaction:
     def __init__(self, data) -> None:
         self.data = data
 
 class Nps(object_interaction):
-    def __init__(self, data) -> None:
+    def __init__(self, data, name='name') -> None:
         super().__init__(data)
+        self.name = name 
     def interaction(self):
+        Quest.search(['НПС', 'name'])
         with open(f"text/{self.data}", 'r', encoding='utf-8') as file:
             bf = file.readline()
         return bf
@@ -41,12 +44,13 @@ class object:
         if self.sprait != "":
                 card.layer_one.append([card.sprites[self.sprait], (self.rect[0], self.rect[1])]) 
     def interaction_check(self, map):
-        if self.barrier == 'False':
-            map.layer_barriers.extend(pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50))
         if self.chest != False:
             map.interaction_layer.append((pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50), self.chest.interaction, chest))
         if self.nps != False:
             map.interaction_layer.append((pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50), self.nps.interaction, nps))
+    def interaction_check_bar(self, map):
+        if self.barrier == 'True':
+            map.layer_barriers.append(pg.Rect(self.rect[0] - camera.rect[0], self.rect[1] - camera.rect[1], 50, 50))
     def dop(self, v):
         self.sprait = [*self.sprait, v[0]]
         self.py_sprai = [*self.py_sprai, v[1]]
@@ -112,7 +116,7 @@ class Map_class:
         self.sprites = []
         self.sprites_py = []
     def converting_txt_v_map(self):
-        with open("proverka.txt", 'r', encoding='utf-8') as file:
+        with open("map.txt", 'r', encoding='utf-8') as file:
             bag = (file.readline()).strip().split(', ')
             self.sprites = [pg.image.load(script.guide.path + i).convert_alpha() for i in bag[:-1]]
             self.sprites_py = bag[:-1]
@@ -146,6 +150,8 @@ class Map_class:
         [win.blit(i[2], i[0]) for i in self.interaction_layer]
         player.draw()
         win.blits([[i[0], (i[1][0] - camera.rect[0], i[1][1] - camera.rect[1])] for i in self.layer_two])
+        for border in card.layer_barriers:
+            pg.draw.rect(win, (0, 0, 255), border)
         self.layer_one = [] # Первый слой пол
         self.interaction_layer = [] # Слой взаимодействия
         self.layer_two = [] # Второй слой
