@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 from script.start_game import win, pg
 import script.guide
 # script.guide.path
@@ -393,4 +394,241 @@ dialog_men = meni(
     ),
     )
     )
-men_list = [inven, battle_men, dialog_men]
+# анимация
+class Animation_movement:
+    def __init__(self, sprait) -> None:
+        self.sprait = sprait
+        self.coordinates = False # x,y
+        self.point = False
+    def point_change(self, cor):
+        self.point = cor
+        if self.coordinates == False:
+            self.coordinates = cor
+    def draw(self):
+        if self.coordinates != False:
+            if self.point != self.coordinates:
+                b = 1
+                if self.point[0] > self.coordinates[0]:
+                    self.coordinates[0] += 1
+                else:
+                    self.coordinates[0] -= 1
+            win.blit(self.sprait, self.coordinates)
+class Animation:
+    def __init__(self, storage, kordinat) -> None:
+        self.storage = storage
+        self.kordinat = kordinat
+        self.mark = 0
+    def output(self):
+        win.blit(self.storage[self.mark], self.kordinat)
+        if self.mark != len(self.storage) - 1:
+            self.mark += 1
+    def update(self, replacement):
+        pass
+    def reset(self):
+        #self.storage = []
+        self.mark = 0
+    def verification(self):
+        if (len(self.storage) - 1) == self.mark:
+            return False
+        else:
+            return True
+    
+cprait = Animation_movement(pg.Surface((5, 10)))
+#animation = Animation()
+class interceptor(): # Класс для перехвата каманд 
+    def __init__(self, back_limit :int) -> None:
+        self.activity = False 
+        self.control_data = [[0, 0] for _ in back_limit]
+        self.back_limit = back_limit
+        self.back_data = back_limit
+    def control(self, action):
+        if action == 'вперёд':
+            self.back_data += 1
+        slow = {'Низ': [0, 1], 'Верх': [0, -1], 'Право': [1, 1], 'Лево': [1, -1]}
+        action = slow[action]
+        self.control_data[action[0]] += action[1]
+# новая версия вкладки
+cv = interceptor()
+class tab():
+    def __init__(self, framework, cyclic_actions=[[],[]], single_actions=[[],[]], active_elements=[], action_activation=[]) -> None:
+        self.activity = False # Активность True/False
+        self.road_map = [] # Список пути
+        self.back = False # Обратный путь
+        self.farther = False # Путь дальше
+        self.framework = framework # Ограничение управления [True, False], [False, True], [True, True] / [x, y]
+        self.control_data = [0, 0] # Данные управления что перехватывает вкладка после активации
+        self.cyclic_actions = cyclic_actions # Цикличные действия не активной вкладки, активной вкладки
+        self.single_actions = single_actions # Еденичные действия не активной вкладки, активной вкладки
+        self.active_elements = active_elements # Список элементов с возможной активацией
+        self.action_activation = action_activation # Действия исполняемые при активации
+    def cycle(self): # Функция цикла, работает по разному в зависемости от активности вкладки
+        if self.road_map != []:
+            self.road_map[-1].cycle()
+            return
+        output = True
+        for i in self.cyclic_actions[self.activity]:
+            if i.output(self):
+                output = False
+                break
+        if output:
+            for i in self.active_elements:
+                i.cycle()
+            if self.activity:
+                self.active_elements[self._priority()].cycle()
+    def reset(self): # Фyнкция сброса данных
+        pass
+    def single(self):
+        if self.activity:
+            self.active_elements[self._priority()].single()
+            return
+        for i in self.single_actions[self.activity]:
+            i.output(self)
+    def relevance(self):
+        road = self
+        while True:
+            if road.farther != False:
+                road = road.farther
+                continue
+            return road
+            
+        pass
+    def _priority(self):
+        if self.framework[0] == True:
+            return self.control_data[0]
+        elif self.framework[1] == True:
+            return self.control_data[1]
+    def control(self, action, road=[]): # Фунцкия управления
+
+        self = self.relevance()
+        if isinstance(self.farther, interceptor):
+            self.farther.control(action)
+            #self.single()
+            return
+        if action == 'вперёд':
+            self.farther = self.active_elements[self._priority()]
+            if isinstance(self.farther, interceptor):
+                self.farther.control(action)
+                return
+            self.farther.back = self
+            self.activity = False
+            self.farther.activity = True
+            return
+        slow = {'Низ': [0, 1], 'Верх': [0, -1], 'Право': [1, 1], 'Лево': [1, -1]}
+        action = slow[action]
+        self.control_data[action[0]] += action[1]
+        self.single()
+
+######
+class base_output():
+    def __init__(self, activity=False) -> None:
+        self.activity = activity
+class output_spait(base_output):
+    def __init__(self, sprait,  activity=False, kordinat=(0,0)) -> None:
+        super().__init__(activity)    
+        self.sprait = sprait
+        self.kordinat = kordinat
+    def output(self, basis):
+        win.blit(self.sprait, self.kordinat)
+class output_animation(base_output):
+    def __init__(self, animation_folder, activity=False, kordinat=(0,0)) -> None:
+        self.anim = Animation(animation_folder, kordinat)
+    def output(self, basis):
+        #win.blit(self.animation[self.last_frame], self.kordinat)
+        self.anim.output()
+class output_function(base_output):
+    def __init__(self, function_, bak,  activity=False) -> None:
+        super().__init__(activity) 
+        self.function_ = function_
+        self.bak = bak
+    def output(self, basis):
+        return self.function_(basis, self.bak)
+class output_table(base_output):
+    def __init__(self, function_, table, restrictions=(0,0), sprait=pg.Surface((0,0), flags=pg.GL_ALPHA_SIZE), start_coordinates=(0,0),  activity=False) -> None:
+        super().__init__(activity) 
+        self.function_ = function_
+        self.table = table
+        self.sprait = sprait
+        self.restrictions = restrictions
+        self.vector = [0, 0]
+        self.start_coordinates = start_coordinates
+    def output(self, basis):
+        self.function_(self.table)
+        win.blit(self.sprait, (self.start_coordinates[0] * self.vector[0], self.start_coordinates[1] * self.vector[1]))
+class output_animation_movement:
+    def __init__(self, called_element, coordinates) -> None:
+        self.called_element = called_element
+        self.coordinates = coordinates
+    def output(self, basis):
+        self.called_element.point_change(self.coordinates.copy())
+class output_animation_movement_draw:
+    def __init__(self, called_element) -> None:
+        self.called_element = called_element
+    def output(self, basis):
+        self.called_element.draw()
+
+# method_list = [method for method in dir(MyClass) if method.startswith('__') is False]
+# print(method_list)
+prototype = (
+tab(
+    framework=[True, False],
+    active_elements=[
+        tab(
+            framework=[True, False],
+            cyclic_actions=[[
+                output_spait(
+                    pg.image.load(script.guide.path + "\\aset\\men\\Back.png").convert_alpha(), activity=True
+                ),
+                output_animation_movement_draw(
+                    cprait
+                )
+                ],[]],
+            single_actions=[[
+                    output_animation_movement(
+                        cprait, [500, 500]
+                    )
+            ], []],
+
+            
+            ),
+        tab(
+            framework=[True, False],
+            cyclic_actions=[[
+                output_spait(
+                    pg.image.load(script.guide.path + "\\aset\\men\\Items.png").convert_alpha(), activity=True
+                ),
+                output_animation_movement_draw(
+                    cprait
+                )
+                    ],[
+                output_animation(
+                    [pg.transform.smoothscale(pg.image.load(script.guide.path + f"\\aset\\men\\{'anin_men'}\\{i}").convert_alpha(), (1360, 768))
+                    for i in os.listdir(f'{script.guide.path}\\aset\\men\\{"anin_men"}')
+                    if '.png' in i], kordinat=(0,0)),
+                output_function(
+                    lambda basis, x: basis.cyclic_actions[1][0].anim.verification(), None
+                ),
+                output_function(
+                    lambda basis, x: x[2](x[0](x[1])), [iventar.sorti, 1, iventar.otrisovka]
+                ),
+                            ]],
+            single_actions=[[
+                    output_animation_movement(
+                        cprait, [600, 500]
+                    )
+                    ],[
+                output_function(
+                    lambda basis, x: basis.cyclic_actions[1][0].reset(), None
+                )
+
+                            ]],
+            active_elements=[
+                tab(
+                framework=[True, False],
+                action_activation=[]                
+                ),
+            ]           
+            ),
+    ]
+)
+            )
+men_list = [prototype,]#[inven, battle_men, dialog_men]
