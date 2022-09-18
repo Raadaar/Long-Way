@@ -1,6 +1,6 @@
 from script.start_game import win, pg, sys, randint, f1
 import script.guide
-from script.map import prop_objects, recursion_otr, card, bar
+from script.map import prop_objects, recursion_otr, card, moving
 # Название игры
 pg.display.set_caption('Long Way')
 from script.base_classes import player, object, camera, Player, cam
@@ -28,8 +28,9 @@ from script.items import *
 from script.inven import *
 from script.player_modile import *
 from script.enemy import *
-#for i in thing.list_of_items.values():
-#    iventar.dopov([i, 1])
+for i in thing.list_of_items.values():
+    iventar.dopov([i, 1])
+from script.sound import sound, leaves
 ######################################################
 from script.menu import inven, battle_men, men_list, fps, dialog_men, text
 ######################################################
@@ -73,6 +74,7 @@ per_re_batl = [False, # Проверка попадает ли игрок в з�
                False] # Активация магии
 kno_battle_men = [1, 0]
 # Список боевых зон
+son_sond = pg.Surface((200, 200))
 battle_men_son = [pg.Rect(0, 0, 300, 300)]
 camera.rect[0], camera.rect[1] = 500, 500
 player.rect[0], player.rect[1] = 500, 500
@@ -88,36 +90,37 @@ while  1:
             sys.exit()
         if event.type==pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
-                if sum(i.aktv for i in men_list) == 0:
-                    akt_fn = inven.fkl()
+                if sum(i.activity for i in men_list) == 0:
+                    men_list[0].activity = True
+                    men_list[0].single()
                 else:
-                    for i in men_list:
-                        if i.aktv == True:
-                            i.fkl()
+                    for i in [i.relevance() for i in men_list]:
+                        if i.activity == True:
+                            i.control('обратно')
             if event.key == pg.K_RIGHT:
                 for i in men_list:
-                    if i.aktv == True:
-                        i.peredwe('Право')
+                    if i.activity == True:
+                        i.control('Право')
             if event.key == pg.K_LEFT:
                 for i in men_list:
-                    if i.aktv == True:
-                        i.peredwe('Лево')
+                    if i.activity == True:
+                        i.control('Лево')
             if event.key == pg.K_UP:
                 for i in men_list:
-                    if i.aktv == True:
-                        i.peredwe('Верх')
+                    if i.activity == True:
+                        i.control('Верх')
             if event.key == pg.K_DOWN:
                 for i in men_list:
-                    if i.aktv == True:
-                        i.peredwe('Низ')
+                    if i.activity == True:
+                        i.control('Низ')
             if event.key == 13: 
-                if sum(i.aktv for i in men_list) == 0:
+                if sum(i.activity for i in men_list) == 0:
                     bj_ = True    
                     bj = player.test_area()
                     #[print(i[2]) for i in card.interaction_layer if bj.colliderect(i[0])]    
                 for i in men_list:
-                    if i.aktv == True:
-                        i.akt()
+                    if i.activity == True:
+                        i.control('вперёд')
    
             if event.key == pg.K_z:
                 print([i.HP for i in batlee.enemy_list])  
@@ -202,6 +205,8 @@ while  1:
         if vector != [0, 0]:
             player.move(vector, fps.fps)
             camera.move(vector)
+            moving.cl_1_sk_sd.blit(moving.cl_1_sk, (vector[0], vector[1]))
+            cl_1_sk = moving.cl_1_sk_sd
             if per_re_batl[0] == True:
                 if randint(0, 1000) > 990 and False:
                     border.beginning_battle(batlee)
@@ -234,6 +239,7 @@ while  1:
     prop_objects = sorted(prop_objects, key=lambda x: [x.rect[0], x.rect[1]])
     #[recursion_otr(i.compound, 0) for i in prop_objects if i.rect.colliderect(camera.rect)]
     recursion_otr()
+   
     if bj_:
         #pg.draw.rect(win, (100, 100, 100), bj)#(bj[0], bj[1], bj[2], bj[3]))
         for i in card.interaction_layer:
@@ -247,7 +253,30 @@ while  1:
             if bj.colliderect(ix):
                 Quest.search(['взаимодействие', i])
         bj_ = False
+    win.blit(moving.cl_1_sk, (-320, -116))
+    #win.blit(moving.cl_2_sk, (-320, -116)) 680, 384
     card.drawing_layers()
+    pg.draw.rect(win, (255, 0, 0), (1000 - camera.rect[0], 1000 - camera.rect[1], 200, 200), 2)
+    #win.blit(son_sond, (1000 - camera.rect[0], 1000 - camera.rect[1]))
+    son_sound_rect = pg.Rect(1000 - camera.rect[0], 1000 - camera.rect[1], 200, 200)
+    if son_sound_rect.colliderect(pg.Rect(680, 384, 50, 50)):
+        x_s, y_s = (680 + camera.rect[0]) - 1000, (384 + camera.rect[1]) - 1000
+        if sound.effects[0].get_sound() == None:
+            sound.effects[0].play(leaves)
+        if x_s < 0:
+            x_s = 0
+        if y_s < 0:
+            y_s = 0
+        if y_s > 100:
+            y_s = (200 % y_s) // 200
+        if x_s > 100:
+            x_s = 200 % x_s
+            #print((x_s + y_s) / 200, (x_s + y_s) / 300)
+            sound.effects[0].set_volume((x_s + y_s) / 200, (x_s + y_s) / 250)#(x_s - 15) / 200)
+        else:
+            sound.effects[0].set_volume((x_s + y_s) / 250, (x_s + y_s) / 200)
+    else:
+        sound.effects[0].stop()
     #[win.blit(i._surface[0], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
     #[win.blit(i._surface[1], (i.rect[0] - camera.rect[0], i.rect[1] - camera.rect[1])) for i in prop_objects if i.rect.colliderect(camera.rect)]
     win.blit(zvet, (750 - camera.rect[0], 750 - camera.rect[1]))
@@ -256,14 +285,15 @@ while  1:
     #win.blit(dereo, (1400 - camera.rect[0], 768 - camera.rect[1]))
     #win.blit(pla, (vector[0], 512 - vector[1]))
     #win.blit(text1, (50, 600))
-    for i in men_list:
-        ost_pyt = i.spis
-        if i.aktv == True:
-            men_ive_gl = True 
-            ost_pyt[i.ataw][0].output(i)
-    if sum(i.aktv for i in men_list) == 0:
+    #if not sound.main_composition.get_busy():
+    #    sound.change_main_composition('мир')
+    for i in [i.relevance() for i in men_list]:
+        if i.activity == True:
+            men_ive_gl = True
+            i.cycle() 
+    if sum(i.activity for i in [i.relevance() for i in men_list]) == 0:
         turn.check([dialog_men, text], [player, camera])
-        men_ive_gl = False
+        men_ive_gl = False        
     bar = []
     fps.output()
     #win.blit(dre, (50 - camera.rect[0], 600 - camera.rect[1]))

@@ -8,7 +8,14 @@ bar = []
 class object_interaction:
     def __init__(self, data) -> None:
         self.data = data
-
+class Moving():
+    def __init__(self) -> None:
+        self.cl_1 = []
+        self.cl_1_sk = pg.Surface((2000, 1000))
+        self.cl_1_sk_sd = pg.Surface((2000, 1000))
+        self.cl_2 = []
+        self.cl_2_sk = pg.Surface((2000, 1000), flags=pg.GL_ALPHA_SIZE)
+moving = Moving()
 class Nps(object_interaction):
     def __init__(self, data, name='name') -> None:
         super().__init__(data)
@@ -188,6 +195,7 @@ def recursion_otr():#spis, ind):
                         if v.rect.colliderect(camera.rect):
                             [[obj.draw(), obj.interaction_check(card)] for obj in v.compound if obj.rect.colliderect(camera.rect)]
                             [card.layer_two.append(obj) for obj in v.layer_two if pg.Rect(obj[1][0], obj[1][1], obj[0].get_width(), obj[0].get_height()).colliderect(camera.rect)]# and obj not in card.layer_two]
+
                             #for obj in v.layer_two:
                             #    if pg.Rect(obj[1][0], obj[1][1], obj[0].get_width(), obj[0].get_height()).colliderect(camera.rect):
                             #        card.layer_two.append(obj)
